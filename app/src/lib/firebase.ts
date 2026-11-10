@@ -269,6 +269,62 @@ export function subscribeRoom(room: RoomRef, callbacks: { members: (value: Recor
   return () => { stopMembers(); stopMessages(); };
 }
 
+const ROOM_PRESENCE_MAX_AGE = 90_000;
+
+/** Membership is persistent access; presence is one disposable record per connected tab. */
+export function trackRoomPresence(room: RoomRef, onError: (message: string) => void) {
+  const { db, uid } = requireConnection();
+  const session = push(ref(db, `roomPresence/${roomPath(room)}/${uid}`));
+  let disposed = false;
+  let timer: ReturnType<typeof setInterval> | undefined;
+  let queue: Promise<void> = Promise.resolve();
+  const enqueue = (operation: () => Promise<void>) => {
+    const pending = queue.then(operation, operation);
+    queue = pending.catch(() => undefined);
+    return pending;
+  };
+  const fail = (error: unknown) => { if (!disposed) onError(humanError(error)); };
+  void enqueue(async () => {
+    if (disposed) return;
+    await onDisconnect(session).remove();
+    if (disposed) return;
+    await set(session, serverTimestamp());
+    if (disposed) return;
+    timer = setInterval(() => {
+      if (!connected || disposed) return;
+      void enqueue(async () => {
+        if (!disposed) await set(session, serverTimestamp());
+      }).catch(fail);
+    }, 30_000);
+  }).catch(fail);
+  return () => {
+    disposed = true;
+    if (timer) clearInterval(timer);
+    void enqueue(async () => {
+      await remove(session);
+      await onDisconnect(session).cancel();
+    }).catch(() => undefined);
+  };
+}
+
+export function subscribeRoomPresence(room: RoomRef, callback: (uids: string[]) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  let sessions: Record<string, Record<string, number>> = {};
+  let failed = false;
+  const emit = () => {
+    if (!failed) callback(Object.entries(sessions).filter(([, tabs]) =>
+      Object.values(tabs).some(at => typeof at === 'number' && at > serverNow() - ROOM_PRESENCE_MAX_AGE)
+    ).map(([uid]) => uid));
+  };
+  const stop = onValue(ref(db, `roomPresence/${roomPath(room)}`), snapshot => {
+    sessions = snapshot.val() || {};
+    failed = false;
+    emit();
+  }, error => { failed = true; onError(humanError(error)); });
+  const timer = setInterval(emit, 5_000);
+  return () => { stop(); clearInterval(timer); };
+}
+
 export async function getRoomMeta(room: RoomRef): Promise<RoomMeta> {
   const { db } = requireConnection();
   return (await get(ref(db, `${roomPath(room)}/meta`))).val() as RoomMeta;

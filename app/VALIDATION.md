@@ -327,3 +327,36 @@
   commit/push/deploy. Chưa thử thiết bị thật, bàn phím ảo, nhiều tab cùng UID hoặc cập nhật PWA production.
 - Rà cuối: heartbeat ghi đủ bản ghi để có thể dựng lại mục bị gỡ; chạy lại rooms + firebase-service:
   7/7 pass (22,9s), check/build và `git diff --check` pass. Emulator do phiên này mở đã dừng sau kiểm tra.
+
+## Đồng bộ người đang ở trong phòng — 2026-11-11
+
+- Tái hiện trên emulator: chủ phòng bấm Rời phòng, máy khách vẫn giữ avatar trong `.room-member`
+  sau 4s; test mới đỏ đúng lỗi. Lượt thử đầu emulator chưa sẵn sàng nên nút tạo bị disabled;
+  đợi emulator sẵn sàng và thử lại mới ghi nhận lỗi avatar (không coi lỗi khởi động là bằng chứng).
+- Nguyên nhân: `Room.tsx` lấy avatar/số người từ membership lưu lâu dài; rời phòng chỉ bỏ chọn
+  room trên thiết bị và gỡ mục lobby. Không có hiện diện theo kết nối cho thành viên trong phòng.
+- `lib/firebase.ts` thêm track/subscribe hiện diện theo `roomPresence/{kind}/{code}/{uid}/{session}`;
+  `AppContext.tsx` theo dõi phòng đang chọn cho cả rooms/selectedRooms. Rời phòng cleanup gỡ phiên;
+  đóng tab dùng `onDisconnect`; heartbeat 30s, lọc phiên quá 90s mỗi 5s là dự phòng. Mỗi tab có
+  khóa phiên riêng nên đóng một tab không làm UID còn tab khác biến mất. Subscription lỗi không
+  bị timer biến thành danh sách rỗng giả; UI hiện chưa rõ hiện diện và thông báo lỗi.
+- `Room.tsx` chỉ hiển thị avatar/số người có hiện diện, giữ nguyên membership dùng cấp quyền,
+  lịch sử chat và game. Không xóa dữ liệu cũ hoặc vai trò game để che lỗi. Không sửa CSS/bố cục.
+- `database.rules.json`: thành viên mới được đọc hiện diện phòng; chỉ ghi/xóa phiên UID của mình,
+  loại phòng/khóa phiên/timestamp được kiểm tra. Chỉ thêm test vào tests hiện có, không yếu hóa test cũ.
+- Test mới `rooms.spec.ts`: chủ và khách rời đều mất avatar ở máy kia, vào lại hiện lại; tin nhắn còn;
+  hai tab cùng UID có đủ hai phiên server, đóng một tab vẫn hiện và đóng tab cuối mới mất avatar.
+  Lượt qua đầu đo 216ms, lượt hồi quy cuối đo **170ms** từ thao tác rời đến xác nhận avatar đã gỡ;
+  đây là số đo emulator, không phải SLA mạng thật.
+- `node --test tests/database.test.mjs` trên emulator đang chạy và lượt cuối `npm test` tự mở/dừng
+  emulator: 28/28 pass. Thêm 4 bài bảo vệ
+  hiện diện riêng tư, cấm giả mạo UID/payload/kind/parent-write, độc lập phiên và phòng ghép đôi.
+- Hồi quy trình duyệt: lượt đầu 12/13 pass, bài avatar lớn có permission_denied khi tạo phòng;
+  không sửa test hoặc logic ngoài phạm vi. Chạy riêng bài đó 1/1 pass, chạy lại toàn bộ nhóm
+  **13/13 pass (49,8s)**, gồm room/presence, Firebase service, chat/sticker/game, matched room,
+  icon và real-routes. Bài rooms tiếp tục kiểm tra hai theme × 360/390/768/1440px và landscape.
+- Check/build pass; 5/5 test game pass; build vẫn cảnh báo chunk chính >500kB như trước.
+  Không có page error trong bài presence; không kiểm thử lên Firebase thật hoặc điện thoại vật lý.
+- Cần Publish Rules mới có `roomPresence` rồi cập nhật/reload cả hai trình duyệt để dùng sửa lỗi.
+  Mất mạng đột ngột vẫn có độ trễ phát hiện; không tuyên bố đồng bộ tức thời tuyệt đối. Chưa Publish
+  Rules, commit/push/deploy. Firebase config/auth/khóa lưu/schema chat-game giữ nguyên.

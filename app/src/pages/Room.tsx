@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { createRoom, joinRoom, subscribeRoom, getOwnerPassword, getRoomMeta, subscribeOpenRooms } from '../lib/firebase';
+import { createRoom, joinRoom, subscribeRoom, getOwnerPassword, getRoomMeta, subscribeOpenRooms, subscribeRoomPresence } from '../lib/firebase';
 import type { Member, OpenRoom, RoomMeta } from '../types';
 import { useApp, localKey } from '../state/AppContext';
 import { AvatarView, Badge, Button, EmptyState, Icon, Modal, PageHeading } from '../components/ui';
@@ -17,6 +17,8 @@ export default function Room() {
   const [ownerPassword, setOwnerPassword] = useState('');
   const createdPassword = useRef<{ code: string; password: string } | null>(null);
   const [members, setMembers] = useState<Record<string, Member>>({});
+  const [present, setPresent] = useState<string[] | null>(null);
+  const [presenceError, setPresenceError] = useState('');
   const [meta, setMeta] = useState<RoomMeta | null>(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -54,6 +56,12 @@ export default function Room() {
     setListLoading(true);
     return subscribeOpenRooms(values => { setOpenRooms(values); setListLoading(false); }, message => { setListError(message); setListLoading(false); });
   }, [ready, room?.code, room?.kind]);
+
+  useEffect(() => {
+    setPresent(null); setPresenceError('');
+    if (!room || !ready) return;
+    return subscribeRoomPresence(room, uids => { setPresent(uids); setPresenceError(''); }, message => { setPresent(null); setPresenceError(message); });
+  }, [room?.code, room?.kind, ready]);
 
   async function create(event: FormEvent) {
     event.preventDefault();
@@ -93,6 +101,7 @@ export default function Room() {
     catch { notify('Trình duyệt chưa cho phép sao chép. Anh có thể chọn và chép nội dung hiển thị.'); }
   }
 
+  const currentMembers = Object.entries(members).filter(([id]) => present?.includes(id));
   const isHost = meta?.hostUid === uid;
   const passwordless = meta?.passwordless === true;
   const invitation = room ? 'Mình hẹn nhau dưới trăng nhé.\n' + location.origin + '/room?code=' + room.code + '\nMã phòng: ' + room.code + (ownerPassword && !passwordless ? '\nMật khẩu: ' + ownerPassword : '') : '';
@@ -147,12 +156,13 @@ export default function Room() {
     </> : <>
       <section className="surface room-summary">
         <div><span className="eyebrow">{room.kind === 'selectedRooms' ? 'KẾT NỐI CỦA HAI BẠN' : 'PHÒNG RIÊNG'}</span><div className="room-code">{room.code}<Button variant="ghost" aria-label="Sao chép mã phòng" onClick={() => void copy(room.code)}><Icon name="copy" size={18} /></Button></div>{meta && room.kind === 'rooms' && <p className="hint">{passwordless ? 'Không cần mật khẩu để vào' : 'Được bảo vệ bằng mật khẩu'}{isHost && (meta.listed ? ' · Hiện khi bạn đang ở trong phòng' : ' · Không hiện trong danh sách')}</p>}</div>
-        <div className="room-members">{Object.entries(members).map(([id, m]) => <div key={id} className="room-member"><AvatarView avatar={m.avatar} name={m.name} size="sm" /><span>{m.name}</span></div>)}<Badge>{Object.keys(members).length} người trong phòng</Badge></div>
+        <div className="room-members" role="group" aria-label="Người đang trong phòng">{currentMembers.map(([id, m]) => <div key={id} className="room-member"><AvatarView avatar={m.avatar} name={m.name} size="sm" /><span>{m.name}</span></div>)}<Badge>{presenceError ? 'Chưa rõ hiện diện' : present === null ? 'Đang đồng bộ…' : currentMembers.length + ' người đang trong phòng'}</Badge></div>
         {isHost && room.kind === 'rooms' && <details className="room-password"><summary>{ownerPassword && !passwordless ? 'Xem mật khẩu & lời mời' : 'Chia sẻ lời mời'}</summary><div className="actions">{ownerPassword && !passwordless && <code>{ownerPassword}</code>}<Button variant="secondary" onClick={() => void copy(invitation)}>Chép lời mời<Icon name="copy" size={16} /></Button></div>{!ownerPassword && !passwordless && <p className="hint">Mật khẩu bạn đặt không thể xem lại nếu dữ liệu trên trình duyệt đã bị xóa.</p>}</details>}
       </section>
       <div className="tab-row" role="tablist" aria-label="Hoạt động trong phòng"><button role="tab" aria-selected={tab === 'chat'} className={'tab-button' + (tab === 'chat' ? ' active' : '')} onClick={() => setTab('chat')}><Icon name="chat" size={18} />Trò chuyện</button><button role="tab" aria-selected={tab === 'games'} className={'tab-button' + (tab === 'games' ? ' active' : '')} onClick={() => setTab('games')}><Icon name="game" size={18} />Chơi cùng nhau</button></div>
       {tab === 'chat' ? <div className="surface chat-layout"><ChatPanel room={room} /></div> : profile && <CoupleGames room={room} profile={profile} onError={notify} />}
     </>}
+    {room && presenceError && <p role="alert" className="error-text">Chưa đồng bộ được người đang trong phòng. {presenceError}</p>}
     {error && !selected && <p role="alert" className="error-text">{error}</p>}
     {selected && <Modal title={'Vào phòng của ' + selected.hostName} onClose={() => { setSelected(null); setError(''); }}>
       <p>Phòng <strong>{selected.code}</strong> có mật khẩu. Nhập mật khẩu chủ phòng đã gửi cho bạn.</p>

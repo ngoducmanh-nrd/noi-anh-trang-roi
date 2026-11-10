@@ -57,12 +57,21 @@ Trước khi đổi domain cần chủ động sao lưu kỷ niệm/hồ sơ và
   Chỉ chủ phòng được ghi một mục của chính mình, và Rules đối chiếu phòng/UID/trạng thái khóa.
   Khi rời phòng hoặc mất kết nối, mục được gỡ; heartbeat 45 giây và lọc mục cũ quá 4 phút
   là dự phòng khi trình duyệt treo/mất mạng. Danh sách hiển thị tối đa 60 mục mới nhất.
+- Hàng avatar/số người trong phòng lấy từ hiện diện theo từng tab ở
+  `roomPresence/{kind}/{code}/{uid}/{session}` (chỉ thành viên được đọc), không dùng danh sách
+  `members` lưu lâu dài làm số người đang có mặt. Bấm Rời phòng gỡ phiên ngay khi còn kết nối;
+  đóng tab/mất mạng dùng `onDisconnect`. Heartbeat 30s, lọc phiên quá 90s mỗi 5s là dự phòng.
+  Một UID mở nhiều tab chỉ tính một người, còn tab khác trong phòng thì vẫn hiện diện.
+  Không xóa membership, tin nhắn hoặc vai trò game khi rời phòng. Mất mạng đột ngột có thể trễ
+  đến khi Firebase phát hiện ngắt kết nối, không bảo đảm tức thời tuyệt đối.
 - Phòng không khóa: bấm Vào phòng để tham gia ngay. Phòng khóa: nhập đúng mật khẩu trong popup.
   Người ngoài chưa tham gia vẫn không đọc được nội dung của bất kỳ phòng nào.
 - **Cần cập nhật `../database.rules.json` trước khi đưa frontend mới lên môi trường thật.**
   Rules thêm các trường tùy chọn `rooms/{code}/meta/{passwordless,passwordFormat,listed}` và
-  path `roomLobby`; không migration hay đổi dữ liệu phòng cũ. Chỉ deploy frontend mà chưa cập nhật
-  Rules sẽ khiến tạo phòng kiểu mới và tải danh sách bị từ chối. Không tự Publish Rules trong đợt này.
+  path `roomLobby`, `roomPresence`; không migration hay đổi dữ liệu phòng cũ. Chỉ deploy frontend mà chưa cập nhật
+  Rules sẽ khiến tạo phòng kiểu mới, tải danh sách và báo hiện diện bị từ chối. Đợt sửa hiện diện
+    cần Publish bản Rules mới và cập nhật/reload cả hai phía; client cũ chưa gửi trạng thái hiện diện.
+    Không tự Publish Rules trong đợt này.
 - Kiểm tra riêng: sau khi chạy emulator auth/database và dev server như bên dưới,
   `npx playwright test tests/rooms.spec.ts tests/firebase-service.spec.ts` trong `app/`.
 

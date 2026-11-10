@@ -162,3 +162,55 @@ test('new password remains visible if password storage is full and never recover
     await expect(page.locator('.room-password')).toContainText('không thể xem lại');
   } finally { await context.close(); }
 });
+
+test('room presence removes departed avatars immediately and keeps another tab of the same user online', async ({ browser, request }) => {
+  test.setTimeout(90000);
+  const ca = await browser.newContext(), cb = await browser.newContext();
+  const errors: string[] = [];
+  try {
+    const a = await prepare(ca, 'Chủ phòng Hiện diện'), b = await prepare(cb, 'Khách Hiện diện');
+    for (const page of [a, b]) page.on('pageerror', error => errors.push(error.message));
+    await a.getByRole('switch', { name: 'Bảo vệ bằng mật khẩu', exact: true }).uncheck();
+    await a.getByRole('button', { name: 'Tạo phòng mới', exact: true }).click();
+    await expect(a.locator('.room-code')).toBeVisible();
+    const code = (await a.locator('.room-code').innerText()).trim();
+    await card(b, 'Chủ phòng Hiện diện').getByRole('button').click();
+    await expect(b.locator('.room-member')).toHaveCount(2);
+    await b.getByLabel('Tin nhắn riêng', { exact: true }).fill('Tin nhắn vẫn còn sau khi rời phòng.');
+    await b.getByRole('button', { name: 'Gửi tin nhắn', exact: true }).click();
+    const hostAvatar = b.locator('.room-member').filter({ hasText: 'Chủ phòng Hiện diện' });
+    const started = Date.now();
+    await leave(a);
+    await expect(hostAvatar).toHaveCount(0, { timeout: 4000 });
+    console.log('host avatar removed after explicit leave in', Date.now() - started, 'ms');
+    await expect(b.locator('.room-member')).toHaveCount(1);
+    await expect(b.locator('.chat-feed')).toContainText('Tin nhắn vẫn còn sau khi rời phòng.');
+    await a.getByLabel('Mã phòng', { exact: true }).fill(code);
+    await a.getByRole('button', { name: 'Mở cửa căn phòng', exact: true }).click();
+    await expect(hostAvatar).toHaveCount(1);
+    await expect(a.locator('.room-member')).toHaveCount(2);
+    await leave(b);
+    await expect(a.locator('.room-member')).toHaveCount(1, { timeout: 4000 });
+    await b.getByLabel('Mã phòng', { exact: true }).fill(code);
+    await b.getByRole('button', { name: 'Mở cửa căn phòng', exact: true }).click();
+    await expect(a.locator('.room-member')).toHaveCount(2);
+    const anotherTab = await ca.newPage();
+    anotherTab.on('pageerror', error => errors.push(error.message));
+    await anotherTab.goto('/room');
+    await expect(anotherTab.locator('.room-member')).toHaveCount(2);
+    const sessions = async () => {
+      const response = await request.get(`http://127.0.0.1:9000/roomPresence/rooms/${code}.json?ns=demo-inlove-owned-default-rtdb`, { headers: { Authorization: 'Bearer owner' } });
+      return Object.values(await response.json() || {}).map(tabs => Object.keys(tabs as object).length).sort();
+    };
+    await expect.poll(sessions).toEqual([1, 2]);
+    await a.close();
+    await expect.poll(sessions).toEqual([1, 1]);
+    await expect(hostAvatar).toHaveCount(1);
+    await expect(b.locator('.room-member')).toHaveCount(2);
+    await anotherTab.close();
+    await expect(hostAvatar).toHaveCount(0, { timeout: 20000 });
+    await expect(b.locator('.room-member')).toHaveCount(1);
+    await expect(b.locator('.chat-feed')).toContainText('Tin nhắn vẫn còn sau khi rời phòng.');
+    expect(errors).toEqual([]);
+  } finally { await Promise.all([ca.close(), cb.close()]); }
+});

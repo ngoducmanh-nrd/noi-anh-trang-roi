@@ -207,6 +207,19 @@
         }
       }
     },
+    "roomPresence": {
+      "$kind": {
+        "$code": {
+          ".read": "auth != null && ($kind === 'rooms' || $kind === 'selectedRooms') && root.child($kind).child($code).child('members').child(auth.uid).exists()",
+          "$uid": {
+            "$session": {
+              ".write": "auth != null && auth.uid === $uid && ($kind === 'rooms' || $kind === 'selectedRooms') && (!newData.exists() || root.child($kind).child($code).child('members').child(auth.uid).exists())",
+              ".validate": "$session.matches(/^[-A-Za-z0-9_]{20}$/) && newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 60000"
+            }
+          }
+        }
+      }
+    },
     "roomLobby": {
       ".read": "auth != null",
       ".indexOn": [

@@ -224,3 +224,48 @@ test('legacy and unlisted rooms cannot be published and metadata cannot be downg
   await db('alice').ref('rooms/'+code).set({meta:{hostUid:'alice',createdAt:Date.now(),listed:false},members:{alice:profile('alice')}});
   await assertFails(db('alice').ref('roomLobby/alice').set(listing()));
 });
+
+const sessionA = 'ABCDEFGHIJKLMNOPQRST', sessionB = 'QRSTUVWXYZABCDEFGHIJ';
+const roomPresence = (uid, session = sessionA, kind = 'rooms') => `roomPresence/${kind}/${code}/${uid}/${session}`;
+test('room presence is private to members and only the current user can publish their own session', async () => {
+  await createRoom(); await joinRoom();
+  await assertSucceeds(db('alice').ref(roomPresence('alice')).set(Date.now()));
+  await assertSucceeds(db('bob').ref('roomPresence/rooms/'+code).once('value'));
+  await assertFails(db('eve').ref('roomPresence/rooms/'+code).once('value'));
+  await assertFails(db().ref('roomPresence/rooms/'+code).once('value'));
+  await assertFails(db('alice').ref('roomPresence').once('value'));
+  await assertFails(db('eve').ref(roomPresence('eve')).set(Date.now()));
+  await assertFails(db('bob').ref(roomPresence('alice')).set(Date.now()));
+  await assertFails(db('bob').ref(roomPresence('alice')).remove());
+});
+test('presence sessions reject forged kinds, timestamps, payloads and parent writes', async () => {
+  await createRoom();
+  const own = db('alice').ref(roomPresence('alice'));
+  for (const value of [0,Date.now()+86400000,true,'online',{at:Date.now()}]) await assertFails(own.set(value));
+  await assertFails(db('alice').ref(roomPresence('alice','bad')).set(Date.now()));
+  await assertFails(db('alice').ref(roomPresence('alice',sessionA,'unknown')).set(Date.now()));
+  await assertFails(db('alice').ref('roomPresence/rooms/'+code+'/alice').set({[sessionA]:Date.now()}));
+  await assertSucceeds(own.set(Date.now()));
+});
+test('each tab can leave independently without deleting membership or chat access', async () => {
+  await createRoom(); await joinRoom();
+  const a = db('alice').ref(roomPresence('alice')), b = db('alice').ref(roomPresence('alice',sessionB));
+  await assertSucceeds(a.set(Date.now()));
+  await assertSucceeds(b.set(Date.now()));
+  await assertSucceeds(a.remove());
+  assert.equal((await db('bob').ref('roomPresence/rooms/'+code+'/alice').once('value')).numChildren(),1);
+  await assertSucceeds(b.remove());
+  assert.equal((await db('bob').ref('roomPresence/rooms/'+code+'/alice').once('value')).exists(),false);
+  await assertSucceeds(db('alice').ref('rooms/'+code+'/messages').push(message()));
+  assert.equal((await db('bob').ref('rooms/'+code+'/members').once('value')).numChildren(),2);
+});
+test('matched room presence uses the same membership boundary without altering the matched pair', async () => {
+  await pendingInvite();
+  await db('bob').ref('selectedRooms/'+code).set(selectedRoom());
+  await assertSucceeds(db('alice').ref(roomPresence('alice',sessionA,'selectedRooms')).set(Date.now()));
+  await assertSucceeds(db('bob').ref('roomPresence/selectedRooms/'+code).once('value'));
+  await assertFails(db('eve').ref(roomPresence('eve',sessionA,'selectedRooms')).set(Date.now()));
+  await assertFails(db('eve').ref('roomPresence/selectedRooms/'+code).once('value'));
+  await assertSucceeds(db('alice').ref(roomPresence('alice',sessionA,'selectedRooms')).remove());
+  assert.equal((await db('bob').ref('selectedRooms/'+code+'/members').once('value')).numChildren(),2);
+});
