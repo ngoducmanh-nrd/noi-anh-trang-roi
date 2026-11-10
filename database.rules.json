@@ -15,13 +15,22 @@
           "createdAt": {
             ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val())"
           },
+          "passwordless": {
+            ".validate": "newData.val() === true && !data.exists()"
+          },
+          "passwordFormat": {
+            ".validate": "newData.val() === 'sha256' && !data.exists()"
+          },
+          "listed": {
+            ".validate": "newData.isBoolean() && !data.exists()"
+          },
           "$other": {
             ".validate": false
           }
         },
         "members": {
           "$uid": {
-            ".write": "auth != null && $uid === auth.uid && (root.child('rooms').child($code).child('meta/hostUid').val() === auth.uid || (root.child('roomAccess').child($code).child(auth.uid).val() === root.child('roomPasswords').child($code).val() && root.child('roomPasswords').child($code).isString())) && newData.exists()",
+            ".write": "auth != null && $uid === auth.uid && (root.child('rooms').child($code).child('meta/hostUid').val() === auth.uid || root.child('rooms').child($code).child('meta/passwordless').val() === true || (root.child('roomAccess').child($code).child(auth.uid).val() === root.child('roomPasswords').child($code).val() && root.child('roomPasswords').child($code).isString())) && newData.exists()",
             ".validate": "newData.hasChildren(['name','avatar','joinedAt']) && (!root.child('rooms').child($code).exists() ? $uid === auth.uid : true)",
             "name": {
               ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 26"
@@ -195,6 +204,46 @@
           ".read": "auth != null && $uid === auth.uid",
           ".write": "auth != null && $uid === auth.uid && newData.isString() && newData.val() === root.child('roomPasswords').child($code).val()",
           ".validate": "newData.isString() && newData.val().length >= 16 && newData.val().length <= 64"
+        }
+      }
+    },
+    "roomLobby": {
+      ".read": "auth != null",
+      ".indexOn": [
+        "updatedAt"
+      ],
+      "$uid": {
+        ".write": "auth != null && $uid === auth.uid",
+        ".validate": "newData.hasChildren(['hostUid','code','hostName','locked','updatedAt']) && newData.child('hostUid').val() === $uid && newData.child('code').isString() && newData.child('code').val().matches(/^[A-Z0-9]{8}$/) && root.child('rooms').child(newData.child('code').val()).child('meta/hostUid').val() === $uid && root.child('rooms').child(newData.child('code').val()).child('meta/listed').val() === true && newData.child('locked').val() === !(root.child('rooms').child(newData.child('code').val()).child('meta/passwordless').val() === true)",
+        "hostUid": {
+          ".validate": "newData.isString()"
+        },
+        "code": {
+          ".validate": "newData.isString()"
+        },
+        "hostName": {
+          ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 26"
+        },
+        "avatar": {
+          ".validate": "newData.hasChildren(['kind','value'])",
+          "kind": {
+            ".validate": "newData.val() === 'emoji' || newData.val() === 'url' || newData.val() === 'data'"
+          },
+          "value": {
+            ".validate": "newData.isString() && ((newData.parent().child('kind').val() === 'emoji' && newData.val().length > 0 && newData.val().length <= 30) || (newData.parent().child('kind').val() === 'url' && newData.val().length <= 700 && newData.val().matches(/^https?:\\/\\/.+/)) || (newData.parent().child('kind').val() === 'data' && newData.val().length <= 12000 && newData.val().matches(/^data:image\\/(webp|jpeg|png);base64,[A-Za-z0-9+\\/=]+$/)))"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "locked": {
+          ".validate": "newData.isBoolean()"
+        },
+        "updatedAt": {
+          ".validate": "newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 60000"
+        },
+        "$other": {
+          ".validate": false
         }
       }
     },

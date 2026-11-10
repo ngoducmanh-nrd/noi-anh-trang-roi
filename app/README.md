@@ -19,7 +19,7 @@ Mở http://127.0.0.1:5173 . Bản chạy bình thường dùng Firebase riêng 
 
 - Khung ứng dụng với 5 mục chính, URL riêng, nút Back/Forward của trình duyệt.
 - Hồ sơ dạng thẻ cá nhân, màn sửa riêng `/profile/edit`, 16 avatar anime/link/tải lên; vẫn đọc avatar emoji cũ.
-- Phòng có mật khẩu, tin nhắn hai chiều, sticker tự tạo/lưu lại và chat chung.
+- Phòng tùy chọn mật khẩu tự đặt/tự tạo, danh sách phòng đang mở; tin nhắn hai chiều, sticker tự tạo/lưu lại và chat chung.
 - Tìm đôi, hiện diện, lời mời đến/đi, đồng ý/từ chối/thu hồi và phòng ghép đôi.
 - Thật hay Thách: rút bài, hỏi/đáp, đổi lượt không giới hạn, yêu cầu kết thúc có xác nhận.
 - XO 15×15, năm quân liên tiếp, sáu ván thắng, chơi lại và xu ảo.
@@ -38,10 +38,33 @@ Trò chuyện/ghép đôi/game đồng bộ vẫn cần mạng. Đây là PWA, k
 Sử dụng cùng Firebase project và app `[DEFAULT]` để giữ phiên Anonymous hiện có trên cùng origin.
 Hồ sơ, kỷ niệm/ngày hẹn và sticker đọc được từ các khóa localStorage của bản cũ;
 không xóa hoặc ghi đè khóa gốc. Phòng cloud hiện tại được phục hồi nếu phù hợp.
-Chủ phòng có thể lấy lại mật khẩu từ đường dẫn owner-only của Firebase.
+Chủ phòng cũ có thể lấy lại mật khẩu dạng token từ đường dẫn owner-only của Firebase.
+Phòng mới dùng tùy chọn mật khẩu lưu SHA-256 (gắn mã phòng) ở Firebase; mật khẩu rõ chỉ giữ
+ở khóa localStorage của chủ phòng như trước. Xóa dữ liệu trình duyệt sẽ không lấy lại được
+mật khẩu mới từ digest; chủ phòng cần tự nhớ hoặc lưu lại mật khẩu.
 
 Việc chuyển sang domain/origin khác không mang theo localStorage hoặc phiên đăng nhập của trình duyệt.
 Trước khi đổi domain cần chủ động sao lưu kỷ niệm/hồ sơ và kiểm tra việc vào lại phòng.
+
+## Phòng đôi và danh sách phòng
+
+- Tạo phòng: bật/tắt mật khẩu, đặt riêng 8–64 ký tự; bật mật khẩu nhưng để trống thì tạo tự động.
+  Tùy chọn này được chốt khi tạo phòng, không đổi khóa của phòng đang có.
+- Bật **Hiện trong danh sách phòng** để công khai mã phòng, tên/ảnh đại diện chủ phòng và trạng thái khóa.
+  Tắt mục này thì vẫn vào được bằng mã/lời mời, không xuất hiện trong danh sách. Phòng cũ và
+  phòng ghép đôi `selectedRooms` không tự được công khai.
+- Danh sách lấy từ `roomLobby/{hostUid}`, không đọc công khai `rooms/`, tin nhắn hoặc mật khẩu.
+  Chỉ chủ phòng được ghi một mục của chính mình, và Rules đối chiếu phòng/UID/trạng thái khóa.
+  Khi rời phòng hoặc mất kết nối, mục được gỡ; heartbeat 45 giây và lọc mục cũ quá 4 phút
+  là dự phòng khi trình duyệt treo/mất mạng. Danh sách hiển thị tối đa 60 mục mới nhất.
+- Phòng không khóa: bấm Vào phòng để tham gia ngay. Phòng khóa: nhập đúng mật khẩu trong popup.
+  Người ngoài chưa tham gia vẫn không đọc được nội dung của bất kỳ phòng nào.
+- **Cần cập nhật `../database.rules.json` trước khi đưa frontend mới lên môi trường thật.**
+  Rules thêm các trường tùy chọn `rooms/{code}/meta/{passwordless,passwordFormat,listed}` và
+  path `roomLobby`; không migration hay đổi dữ liệu phòng cũ. Chỉ deploy frontend mà chưa cập nhật
+  Rules sẽ khiến tạo phòng kiểu mới và tải danh sách bị từ chối. Không tự Publish Rules trong đợt này.
+- Kiểm tra riêng: sau khi chạy emulator auth/database và dev server như bên dưới,
+  `npx playwright test tests/rooms.spec.ts tests/firebase-service.spec.ts` trong `app/`.
 
 ## Build và xem bản production
 

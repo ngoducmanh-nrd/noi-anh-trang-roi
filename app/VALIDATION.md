@@ -293,3 +293,37 @@
     huy hiệu (giả lập bằng phần tử thử) nằm trong phần lộ ra. Đã xem ảnh thu vào/mở ra ở theme tối.
     `npm run check`: pass. Không dùng Firebase thật; chưa chạy `app.spec.ts` (cần emulator) và chưa
     thử màn hình cảm ứng lớn, nơi không có hover. Chưa commit/push đợt này.
+
+## Phòng đôi: danh sách đang mở và mật khẩu tùy chọn — 2026-11-11
+
+- Theo yêu cầu chức năng mới của chủ dự án, mở rộng ngoài CSS: `pages/Room.tsx` thêm form tạo phòng
+  bật/tắt mật khẩu, tự đặt 8–64 ký tự hoặc để trống để tạo tự động; tùy chọn công khai danh sách.
+  Thêm danh sách phòng, vào thẳng phòng không khóa và popup nhập mật khẩu cho phòng có khóa.
+  Giữ điều khiển chat/game, mã/lời mời và cách chọn/rời phòng hiện có. CSS mới ở `app-interface.css`.
+- `lib/firebase.ts`, `types.ts`, `state/AppContext.tsx`: thêm metadata tùy chọn `passwordless`,
+  `passwordFormat`, `listed`; phòng mới có mật khẩu lưu SHA-256 gắn mã phòng. Mật khẩu rõ vẫn
+  lưu tại khóa localStorage của chủ phòng, không đưa lên danh sách; không trả digest như mật khẩu rõ.
+  Gọi `createRoom(profile)` không có options và phòng cũ giữ định dạng/token cũ, không tự công khai.
+- Danh sách dùng path mới `roomLobby/{hostUid}`, chỉ dữ liệu giới thiệu và trạng thái khóa;
+  không mở quyền đọc `rooms/`, tin nhắn hoặc mật khẩu. Chỉ chủ phòng đã chọn hiển thị được ghi
+  một mục của mình. `onDisconnect`/cleanup gỡ mục, heartbeat 45s, lọc mục cũ quá 4 phút mỗi 15s,
+  tối đa 60 phòng. Phòng ghép đôi `selectedRooms` không xuất hiện trong danh sách.
+- `database.rules.json` bổ sung quyền tương ứng; `tests/database.test.mjs` chỉ thêm helper/test mới,
+  không thay hoặc gỡ các kiểm tra cũ. `npm test`: **24/24 pass**, gồm chặn sai mật khẩu, giả mạo UID,
+  sửa metadata để hạ khóa, liệt kê phòng cũ/không công khai, lộ dữ liệu phòng và dữ liệu danh sách sai.
+- `app/tests/rooms.spec.ts` thêm 4 bài: mật khẩu tự đặt đúng/sai, reload, gỡ danh sách khi host rời/
+  disconnect; khách rời không gỡ phòng của host; phòng không khóa vào thẳng/bằng mã; phòng kín vẫn
+  vào bằng mã/mật khẩu; localStorage đầy vẫn xem được mật khẩu mới trong phiên, reload không lộ digest.
+- Lượt Playwright hồi quy 12/12 pass (47,8s): 4 bài rooms, 3 firebase-service, 1 luồng hai người app,
+  3 icon và 1 real-routes. Chat/sticker, game, kỷ niệm, ghép đôi cũ vẫn qua; không sửa test cũ.
+  Lượt đầu chưa mở dev server nên 6 bài báo ERR_CONNECTION_REFUSED; mở lại 5173 và chạy lại đã pass.
+- Matrix phòng: 2 theme × 360×800, 390×844, 768×1024, 1440×1000, 844×390; không tràn ngang,
+  nút Vào phòng và vùng label switch >=44px. Đã xem ảnh `artifacts/rooms-{night,day}-{390,1440}.png`.
+  Browser dùng project demo/emulator và chặn Firebase thật, không có page error ở bài rooms.
+- `npm run check` ở app/gốc và `npm run build`: pass; còn cảnh báo chunk chính >500kB đã có trước
+  (~997kB, gzip ~505kB). `npm run test:games`: 5/5 pass.
+- Không đổi Firebase project/config, auth UID, schema chat/game hoặc khóa lưu cũ; không migration,
+  không ghi Firebase thật. **Cần cập nhật Rules trước khi phát hành frontend mới**; chưa Publish Rules,
+  commit/push/deploy. Chưa thử thiết bị thật, bàn phím ảo, nhiều tab cùng UID hoặc cập nhật PWA production.
+- Rà cuối: heartbeat ghi đủ bản ghi để có thể dựng lại mục bị gỡ; chạy lại rooms + firebase-service:
+  7/7 pass (22,9s), check/build và `git diff --check` pass. Emulator do phiên này mở đã dừng sau kiểm tra.

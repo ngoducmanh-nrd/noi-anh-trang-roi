@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import type { Profile, RoomRef } from '../types';
-import { initializeConnection, onConnection, setPresence } from '../lib/firebase';
+import { initializeConnection, onConnection, setPresence, trackOpenRoom } from '../lib/firebase';
 
 const project=(window as Window & {APP_CONFIG?:{firebase?:{projectId?:string}}}).APP_CONFIG?.firebase?.projectId||'local';
 const key='moonlight:'+project;
@@ -19,6 +19,7 @@ export function AppProvider({children}:{children:ReactNode}){
   const [looking,setLookingState]=useState(false);
   useEffect(()=>{const yes=()=>setOnline(true),no=()=>setOnline(false);window.addEventListener('online',yes);window.addEventListener('offline',no);return()=>{window.removeEventListener('online',yes);window.removeEventListener('offline',no)}},[]);
   useEffect(()=>{const stop=onConnection(s=>{setUid(s.uid);setReady(s.ready);setConnectionError(s.error)});void initializeConnection().catch(e=>setConnectionError(e instanceof Error?e.message:'Không thể kết nối'));return stop},[]);
+  useEffect(()=>{if(!ready||!uid||!room||room.kind!=='rooms'||!profile)return;return trackOpenRoom(room,profile,message=>setToast('Chưa hiển thị được phòng trong danh sách. '+message))},[ready,uid,room?.code,room?.kind,profile?.name,profile?.avatar.kind,profile?.avatar.value]);
   useEffect(()=>{if(!toast)return;const timer=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(timer)},[toast]);
   function saveProfile(value:Profile){try{localStorage.setItem(key+':profile',JSON.stringify(value));setProfile(value)}catch{setToast('Không lưu được hồ sơ. Kiểm tra dung lượng trình duyệt.')}}
   function selectRoom(value:RoomRef|null){try{localStorage.setItem(key+':room',JSON.stringify(value));setRoom(value)}catch{setToast('Không lưu được phòng trên thiết bị.')}}

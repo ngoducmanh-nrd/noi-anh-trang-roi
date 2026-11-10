@@ -28,7 +28,7 @@ import {
   type Database,
   type DataSnapshot,
 } from 'firebase/database';
-import type { Avatar, ConnectionState, Invite, Member, Message, Person, Profile, RoomRef, Wallet } from '../types';
+import type { Avatar, ConnectionState, Invite, Member, Message, OpenRoom, Person, Profile, RoomMeta, RoomRef, Wallet } from '../types';
 
 // Keep the legacy Firebase app name so an existing browser retains its anonymous UID
 // and the room membership associated with that UID when the React app replaces it.
@@ -202,18 +202,38 @@ export function onConnection(callback: (value: ConnectionState) => void) {
   return () => { connectionListeners.delete(callback); };
 }
 
-export async function createRoom(profile: Profile) {
+export type CreateRoomOptions = { passwordless?: boolean; password?: string; listed?: boolean };
+
+async function roomPasswordHash(code: string, password: string) {
+  const bytes = new TextEncoder().encode(`moonlight-room:${code}:${password}`);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+export async function createRoom(profile: Profile, options?: CreateRoomOptions) {
   const { db, uid } = requireConnection();
   const ownMember = member(profile);
+  const custom = options?.password?.trim() || '';
+  if (!options?.passwordless && custom && (custom.length < 8 || custom.length > 64)) throw new Error('Mật khẩu cần từ 8 đến 64 ký tự.');
   for (let attempt = 0; attempt < 6; attempt++) {
-    const code = randomCode(8), password = randomCode(16);
-    try {
-      await set(ref(db, `rooms/${code}`), { meta: { hostUid: uid, createdAt: serverNow() }, members: { [uid]: ownMember } });
-      await set(ref(db, `roomPasswords/${code}`), password);
-      return { code, password };
-    } catch (error) {
-      if (attempt === 5 || !/permission[\s_-]denied/i.test(String(error))) throw new Error(humanError(error));
+    const code = randomCode(8), password = options?.passwordless ? '' : custom || randomCode(16);
+    const meta: RoomMeta = { hostUid: uid, createdAt: serverNow() };
+    // Calls without options retain the legacy private-room format.
+    if (options) {
+      meta.listed = options.listed ?? true;
+      if (options.passwordless) meta.passwordless = true;
+      else meta.passwordFormat = 'sha256';
     }
+    try {
+      await set(ref(db, `rooms/${code}`), { meta, members: { [uid]: ownMember } });
+    } catch (error) {
+      if (attempt < 5 && /permission[\s_-]denied/i.test(String(error))) continue;
+      throw new Error(humanError(error));
+    }
+    try {
+      if (password) await set(ref(db, `roomPasswords/${code}`), options ? await roomPasswordHash(code, password) : password);
+      return { code, password };
+    } catch (error) { throw new Error(humanError(error)); }
   }
   throw new Error('Không thể tạo phòng. Vui lòng thử lại.');
 }
@@ -222,9 +242,17 @@ export async function joinRoom(code: string, password: string, profile: Profile)
   const { db, uid } = requireConnection();
   const room: RoomRef = { code: code.trim().toUpperCase(), kind: 'rooms' };
   roomPath(room);
-  if (password.length < 16 || password.length > 64) throw new Error('Mật khẩu phòng không đúng.');
+  if (password && (password.length < 8 || password.length > 64)) throw new Error('Mật khẩu phòng không đúng.');
   try {
-    await set(ref(db, `roomAccess/${room.code}/${uid}`), password);
+    if (password) {
+      try {
+        await set(ref(db, `roomAccess/${room.code}/${uid}`), await roomPasswordHash(room.code, password));
+      } catch (error) {
+        // Previously created rooms use a 16–64 character token, not a digest.
+        if (password.length < 16 || !/permission[\s_-]denied/i.test(String(error))) throw error;
+        await set(ref(db, `roomAccess/${room.code}/${uid}`), password);
+      }
+    }
     await update(ref(db, `${roomPath(room)}/members/${uid}`), member(profile));
   } catch (error) {
     if (/permission[\s_-]denied/i.test(String(error))) throw new Error('Sai mã hoặc mật khẩu phòng, hoặc bạn chưa được cấp quyền.');
@@ -241,17 +269,83 @@ export function subscribeRoom(room: RoomRef, callbacks: { members: (value: Recor
   return () => { stopMembers(); stopMessages(); };
 }
 
+export async function getRoomMeta(room: RoomRef): Promise<RoomMeta> {
+  const { db } = requireConnection();
+  return (await get(ref(db, `${roomPath(room)}/meta`))).val() as RoomMeta;
+}
+
+export function subscribeOpenRooms(callback: (value: OpenRoom[]) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  let current: OpenRoom[] = [];
+  const emit = () => callback(current.filter(item => item.updatedAt > serverNow() - PRESENCE_MAX_AGE).sort((a, b) => b.updatedAt - a.updatedAt || a.code.localeCompare(b.code)));
+  const stop = onValue(query(ref(db, 'roomLobby'), orderByChild('updatedAt'), limitToLast(60)), snapshot => {
+    current = Object.values(snapshot.val() || {}) as OpenRoom[];
+    emit();
+  }, error => { current = []; callback([]); onError(humanError(error)); });
+  const timer = setInterval(emit, 15_000);
+  return () => { stop(); clearInterval(timer); };
+}
+
+let roomListingEpoch = 0;
+let roomListingQueue: Promise<void> = Promise.resolve();
+function queueRoomListing(operation: () => Promise<void>) {
+  const pending = roomListingQueue.then(operation, operation);
+  roomListingQueue = pending.catch(() => undefined);
+  return pending;
+}
+
+/** Publish only an opted-in host's active room; never expose the room's contents. */
+export function trackOpenRoom(room: RoomRef, profile: Profile, onError: (message: string) => void) {
+  const { db, uid } = requireConnection();
+  const epoch = ++roomListingEpoch;
+  const node = ref(db, `roomLobby/${uid}`);
+  let registered = false;
+  let disposed = false;
+  let timer: ReturnType<typeof setInterval> | undefined;
+  const fail = (error: unknown) => { if (!disposed) onError(humanError(error)); };
+  void queueRoomListing(async () => {
+    if (disposed || epoch !== roomListingEpoch || room.kind !== 'rooms') return;
+    const meta = await getRoomMeta(room);
+    if (disposed || epoch !== roomListingEpoch || meta.hostUid !== uid || meta.listed !== true) return;
+    const avatar = await chatAvatar(profile.avatar);
+    if (disposed || epoch !== roomListingEpoch) return;
+    registered = true;
+    await onDisconnect(node).remove();
+    if (disposed || epoch !== roomListingEpoch) return;
+    const listing = { hostUid: uid, code: room.code, hostName: cleanName(profile), avatar, locked: meta.passwordless !== true };
+    await set(node, { ...listing, updatedAt: serverTimestamp() });
+    if (disposed || epoch !== roomListingEpoch) return;
+    timer = setInterval(() => {
+      if (!connected || disposed) return;
+      void queueRoomListing(async () => {
+        if (!disposed && epoch === roomListingEpoch) await set(node, { ...listing, updatedAt: serverTimestamp() });
+      }).catch(fail);
+    }, 45_000);
+  }).catch(fail);
+  return () => {
+    disposed = true;
+    if (epoch === roomListingEpoch) roomListingEpoch++;
+    if (timer) clearInterval(timer);
+    if (registered) void queueRoomListing(async () => {
+      await remove(node);
+      await onDisconnect(node).cancel();
+    }).catch(() => undefined);
+  };
+}
+
 export async function updateRoomProfile(room: RoomRef, profile: Profile) {
   const { db, uid } = requireConnection();
   await update(ref(db, `${roomPath(room)}/members/${uid}`), { name: cleanName(profile), avatar: validAvatar(profile.avatar) });
 }
 
-/** Recover the creator's room password after migration/reload. Guests cannot read this path. */
+/** Recover legacy passwords only; new custom passwords are stored as digests. */
 export async function getOwnerPassword(code: string): Promise<string | null> {
   const { db } = requireConnection();
   const normalized = code.trim().toUpperCase();
   roomPath({ kind: 'rooms', code: normalized });
   try {
+    const meta = await getRoomMeta({ kind: 'rooms', code: normalized });
+    if (meta.passwordFormat === 'sha256' || meta.passwordless) return null;
     const snapshot = await get(ref(db, `roomPasswords/${normalized}`));
     return typeof snapshot.val() === 'string' ? snapshot.val() : null;
   } catch (error) {

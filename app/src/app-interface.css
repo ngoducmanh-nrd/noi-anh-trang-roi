@@ -137,6 +137,37 @@
 @media(max-width:375px){.dashboard-person{gap:8px}.dashboard-identity .avatar-lg{width:48px;height:48px}.dashboard-identity h1{font-size:19px}.dashboard-wallet{padding:9px}.connect-tile{padding:16px 12px}.app-settings .app-section-heading{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.app-interface *{scroll-behavior:auto!important}}
 
+/* Room lobby: real host presence, with privacy choices kept next to the create action. */
+.room-entry-grid{align-items:start;grid-template-columns:1fr 1fr}
+.room-entry-heading{display:flex;align-items:center;gap:14px;margin-bottom:20px}
+.room-entry-heading .connect-icon{flex:none;width:48px;height:48px;border-radius:16px}
+.room-entry-heading .eyebrow{font-size:10px;letter-spacing:.1em;color:var(--gold)}
+.room-entry-heading h2{font-size:20px;line-height:1.4;margin:4px 0 0}
+.room-entry-form{display:flex;flex-direction:column;gap:20px}
+.room-entry-form>.button{align-self:flex-start;min-height:44px}
+.room-entry-form .hint{margin:6px 0 0;font-size:12px}
+.room-option{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px;padding:12px 0;border-bottom:1px solid var(--line-soft);cursor:pointer}
+.room-option>span{min-width:0}.room-option strong{display:block;font-size:14px;font-weight:600;line-height:1.5}
+.room-option small{display:block;font-size:12px;line-height:1.6;color:var(--muted);margin-top:4px}
+.room-option input{appearance:none;position:relative;flex:none;width:44px;height:26px;margin:0;border:1px solid var(--line);border-radius:20px;background:var(--surface-hover);cursor:pointer;transition:background-color .2s,border-color .2s}
+.room-option input::after{content:'';position:absolute;left:3px;top:3px;width:18px;height:18px;border-radius:50%;background:var(--muted);transition:transform .2s}
+.room-option input:checked{background:var(--lavender);border-color:var(--lavender)}
+.room-option input:checked::after{background:var(--on-accent,var(--bg));transform:translateX(18px)}
+.room-option input:disabled{opacity:.5;cursor:not-allowed}
+.room-join>.text-muted{font-size:13px;line-height:1.7;margin:0 0 20px}
+.room-lobby-heading{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.room-lobby-heading .eyebrow{font-size:10px;letter-spacing:.1em;color:var(--gold)}
+.room-lobby-heading h2{font-size:20px;line-height:1.4;margin:6px 0 0}
+.room-lobby>.hint{font-size:13px;margin:12px 0 20px}
+.open-room-list{display:grid;grid-template-columns:1fr;list-style:none;margin:0;padding:0;gap:12px}
+.open-room-card{display:flex;align-items:center;gap:16px;padding:16px;border:1px solid var(--line-soft);border-radius:16px;background:var(--surface-raised);min-width:0}
+.open-room-info{flex:1;min-width:0}.open-room-info h3{font-size:14px;line-height:1.5;overflow-wrap:anywhere;margin:0 0 5px;font-weight:600}
+.open-room-code{font:600 12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;color:var(--muted)}
+.open-room-card>.badge{flex:none;gap:5px;font-size:11px}.open-room-card>.button{flex:none;font-size:13px;min-height:44px}
+.room-summary .hint{margin:6px 0 0}
+@media(max-width:1000px){.room-entry-grid{grid-template-columns:1fr}}
+@media(max-width:760px){.room-entry-heading h2,.room-lobby-heading h2{font-size:18px}.open-room-card{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:14px}.open-room-card>.avatar{width:44px;height:44px}.open-room-card>.badge{grid-column:2;justify-self:start}.open-room-card>.button{grid-column:2;justify-self:start}.room-entry-form>.button{align-self:stretch}.room-lobby{padding:20px}.room-option{gap:12px}}
+
 /* Global chat shortcut: tucked against the right edge; hover or keyboard focus slides it out with its label. */
 .app-interface .global-chat-fab{right:0;gap:12px;min-height:52px;padding:0 20px 0 12px;border-right:0;border-radius:26px 0 0 26px;box-shadow:0 6px 24px #080a1555;transform:translateX(calc(100% - 45px));transition:transform .28s cubic-bezier(.215,.61,.355,1),box-shadow .28s}
 .app-interface .global-chat-fab:is(:hover,:focus-visible,:focus-within){transform:none}

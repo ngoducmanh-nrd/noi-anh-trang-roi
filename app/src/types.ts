@@ -22,6 +22,23 @@ export interface RoomRef {
   kind: 'rooms' | 'selectedRooms';
 }
 
+export interface OpenRoom {
+  hostUid: string;
+  code: string;
+  hostName: string;
+  avatar?: Avatar;
+  locked: boolean;
+  updatedAt: number;
+}
+
+export interface RoomMeta {
+  hostUid: string;
+  createdAt: number;
+  passwordless?: boolean;
+  passwordFormat?: 'sha256';
+  listed?: boolean;
+}
+
 export interface Message {
   id: string;
   uid: string;

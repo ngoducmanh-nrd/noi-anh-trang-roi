@@ -167,3 +167,60 @@ test('virtual wallets are private and bounded, hearts accept boolean only', asyn
   await assertSucceeds(db('alice').ref('serverSettings/hearts').set(true));
   await assertFails(db('alice').ref('serverSettings/hearts').set('yes'));
 });
+
+const openRoom = () => ({meta:{hostUid:'alice',createdAt:Date.now(),passwordless:true,listed:true},members:{alice:profile('alice')}});
+async function createListedRoom() {
+  await db('alice').ref('rooms/'+code).set({meta:{hostUid:'alice',createdAt:Date.now(),listed:true,passwordFormat:'sha256'},members:{alice:profile('alice')}});
+  await db('alice').ref('roomPasswords/'+code).set('a'.repeat(64));
+}
+const listing = (over = {}) => ({hostUid:'alice',code,hostName:'Alice',avatar:{kind:'emoji',value:'🥰'},locked:true,updatedAt:Date.now(),...over});
+test('password-free room lets anyone with the code join, without a stored password', async () => {
+  await assertSucceeds(db('alice').ref('rooms/'+code).set(openRoom()));
+  await assertFails(db('bob').ref('rooms/'+code+'/members/alice').set(profile('alice')));
+  await assertSucceeds(db('bob').ref('rooms/'+code+'/members/bob').set(profile('bob')));
+  await assertSucceeds(db('bob').ref('rooms/'+code+'/messages').once('value'));
+  await assertFails(db('eve').ref('rooms/'+code+'/messages').once('value'));
+  await assertFails(db('eve').ref('rooms/'+code+'/members/bob').set(profile('bob')));
+});
+test('password rooms stay closed to a guest without the password, flag cannot be added later', async () => {
+  await createRoom();
+  await assertFails(db('bob').ref('rooms/'+code+'/members/bob').set(profile('bob')));
+  await assertFails(db('alice').ref('rooms/'+code+'/meta/passwordless').set(true));
+  await assertFails(db('bob').ref('rooms/'+code+'/meta/passwordless').set(true));
+  await assertFails(db('alice').ref('rooms/'+code).set({meta:{hostUid:'alice',createdAt:Date.now(),passwordless:false},members:{alice:profile('alice')}}));
+});
+test('open room list is readable by signed-in users and locked matches the room', async () => {
+  await createListedRoom();
+  await assertSucceeds(db('alice').ref('roomLobby/alice').set(listing()));
+  await assertSucceeds(db('bob').ref('roomLobby').orderByChild('updatedAt').limitToLast(30).once('value'));
+  await assertFails(db().ref('roomLobby').once('value'));
+  await assertFails(db('alice').ref('roomLobby/alice').set(listing({locked:false})));
+  await env.clearDatabase();
+  await assertSucceeds(db('alice').ref('rooms/'+code).set(openRoom()));
+  await assertSucceeds(db('alice').ref('roomLobby/alice').set(listing({locked:false})));
+  await assertFails(db('alice').ref('roomLobby/alice').set(listing({locked:true})));
+});
+test('only the host can list or unlist their own room, once per host', async () => {
+  await createListedRoom();
+  await assertFails(db('bob').ref('roomLobby/bob').set(listing({hostUid:'bob'})));
+  await assertFails(db('bob').ref('roomLobby/alice').set(listing()));
+  await assertFails(db('alice').ref('roomLobby/bob').set(listing()));
+  await assertSucceeds(db('alice').ref('roomLobby/alice').set(listing()));
+  await assertFails(db('bob').ref('roomLobby/alice').remove());
+  await assertSucceeds(db('alice').ref('roomLobby/alice').remove());
+});
+test('room list entries reject forged fields, codes and timestamps', async () => {
+  await createListedRoom();
+  const entry = db('alice').ref('roomLobby/alice');
+  for (const value of [listing({code:'ZZZZ9999'}),listing({code:'abc'}),listing({extra:'x'}),listing({hostName:'A'}),listing({updatedAt:0}),listing({updatedAt:Date.now()+86400000}),listing({avatar:{kind:'data',value:'data:image/png;base64,'+'A'.repeat(12001)}}),listing({locked:'yes'})]) await assertFails(entry.set(value));
+  await assertSucceeds(entry.set(listing()));
+});
+test('legacy and unlisted rooms cannot be published and metadata cannot be downgraded', async () => {
+  await createRoom();
+  await assertFails(db('alice').ref('roomLobby/alice').set(listing()));
+  await assertFails(db('alice').ref('rooms/'+code+'/meta/listed').set(true));
+  await assertFails(db('alice').ref('rooms/'+code+'/meta/passwordFormat').set('sha256'));
+  await env.clearDatabase();
+  await db('alice').ref('rooms/'+code).set({meta:{hostUid:'alice',createdAt:Date.now(),listed:false},members:{alice:profile('alice')}});
+  await assertFails(db('alice').ref('roomLobby/alice').set(listing()));
+});
