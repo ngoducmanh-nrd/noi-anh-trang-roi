@@ -1,5 +1,9 @@
 # Backend — đợt siết Firebase Rules
 
+> Tài liệu lịch sử: `public/` và `tests/browser-smoke.js` của bản HTML đã chuyển vào
+> `D:/AI/web-clone/Luu-tru-Noi-Anh-Trang-Roi-20261110/legacy-html/`.
+> Frontend hiện tại ở `app/`; kiểm thử trình duyệt hiện tại ở `app/tests/`.
+
 ## Trạng thái
 
 Đã hoàn tất thay đổi và kiểm tra trên Firebase Emulator. **Chưa Publish rules mới lên Firebase thật.**

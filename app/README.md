@@ -1,7 +1,7 @@
 # Nơi Ánh Trăng Rơi · React app
 
 Bản nâng cấp React + TypeScript + Vite + PWA được chủ dự án yêu cầu riêng.
-Bản HTML cũ ở `../public/` được giữ nguyên để đối chiếu và quay lại khi cần.
+Bản HTML cũ đã chuyển vào thư mục lưu trữ bên ngoài repository; xem README ở thư mục cha.
 
 ## Chạy bản mới
 

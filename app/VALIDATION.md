@@ -163,6 +163,25 @@
   Kiểm thử dùng cấu hình riêng tại trình duyệt và chặn Firebase thật; không chạy lại luồng hai người/emulator.
 - Chưa push/deploy.
 
+## Dọn file và lưu trữ — 2026-11-10
+
+- Theo yêu cầu chủ dự án, chuyển 119 file/16 nhóm vào
+  `D:/AI/web-clone/Luu-tru-Noi-Anh-Trang-Roi-20261110` ngoài repository.
+  Có manifest đường dẫn gốc/đích, kích thước và SHA-256; kiểm tra hash sau chuyển đều trùng khớp.
+- Lưu bản HTML `public/`, Vercel/script/test trình duyệt cũ, README/VALIDATION cũ,
+  ảnh tham khảo, ảnh và báo cáo kiểm thử, ZIP/build/cache/log cũ. Không xóa vĩnh viễn.
+- Root `scripts/check.mjs` nay kiểm tra TypeScript của app, cấu hình public hiện tại và JSON rules;
+  bản kiểm tra HTML cũ được giữ trong archive. README cập nhật đúng lệnh chạy và vị trí source.
+- Gỡ dependency `@animate-ui/react` cài dư tại root; bản dependency của `app/` không thay đổi.
+  Giữ repository `mobile/` riêng, backend/rules và test phân quyền.
+- `npm run check` tại root, `npm run build` tại app và `npm test` tại root: pass.
+  Không ghi Firebase thật. Log emulator phát sinh từ lượt kiểm tra này cũng được lưu trữ.
+- So SHA-256: cả 36 file production vừa build khớp từng byte với build trước khi dọn.
+  `git diff --exit-code` cho source/assets/config/dependency của app, rules và test backend: không đổi.
+- Local http://127.0.0.1:5173 trả HTTP 200. Không chạy lại browser/game tests vì runtime build giữ nguyên.
+- npm báo 19 cảnh báo audit ở bộ công cụ root (14 moderate, 5 high); chưa nâng dependency ngoài phạm vi dọn.
+- Không commit/push/deploy trong đợt dọn này.
+
 ## Bố cục ứng dụng từ ảnh tham khảo — 2026-11-10
 
 - Đã áp dụng skill `D:/SKILL code/ui-ux-pro-max-final/ui-ux-pro-max/SKILL.md`,
