@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AvatarView, Button, Icon } from './ui';
+import ThemeToggle from './ThemeToggle';
 
 type ShellProps = {
   children: ReactNode;
@@ -37,7 +38,7 @@ export default function Shell({ children, profileName, avatar, connection, onEdi
       </div>
     </aside>
     <div className="shell-body">
-      <header className="shell-header"><div className="shell-breadcrumb"><span className="mobile-brand"><Icon name="moon" size={21} /></span><span>{active?.name || 'Khoảnh khắc bên nhau'}</span><span className="breadcrumb-divider">/</span><span className="shell-date">{date}</span></div><div className="shell-header-actions"><span className={`connection-status connection-${connection}`} role="status"><span className="status-dot" /><span>{status}</span></span><button type="button" className="header-avatar-button" aria-label="Mở hồ sơ của bạn" onClick={onEditProfile}><AvatarView avatar={avatar} name={profileName} size="sm" /></button></div></header>
+      <header className="shell-header"><div className="shell-breadcrumb"><span className="mobile-brand"><Icon name="moon" size={21} /></span><span>{active?.name || 'Khoảnh khắc bên nhau'}</span><span className="breadcrumb-divider">/</span><span className="shell-date">{date}</span></div><div className="shell-header-actions"><ThemeToggle /><span className={`connection-status connection-${connection}`} role="status"><span className="status-dot" /><span>{status}</span></span><button type="button" className="header-avatar-button" aria-label="Mở hồ sơ của bạn" onClick={onEditProfile}><AvatarView avatar={avatar} name={profileName} size="sm" /></button></div></header>
       <main id="main-content" className="main-content" tabIndex={-1}>{children}</main>
       <footer className="shell-footer"><span>Nơi Ánh Trăng Rơi</span><span>Mỗi khoảnh khắc, một chút dịu dàng.</span><Icon name="moon" size={14} /></footer>
     </div>

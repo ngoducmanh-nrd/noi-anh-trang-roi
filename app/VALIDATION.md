@@ -97,3 +97,49 @@
 - Offline hỗ trợ bộ khung/hồ sơ/kỷ niệm đã lưu; chat/ghép đôi/game trực tuyến vẫn cần mạng.
 - Chưa có server chống spam, xác minh chiến thắng/xu hoặc thông báo đẩy.
 - Cùng origin mới kế thừa localStorage và phiên Anonymous; chuyển domain cần kế hoạch mang dữ liệu sang.
+
+## Theme sáng/tối cho bản React — 2026-11-10
+
+- `src/components/ThemeToggle.tsx`: nút Sáng/Tối tối thiểu 44px, nhãn trợ năng ổn định,
+  `aria-pressed`, lưu khóa riêng `localKey(':theme')`; mặc định trăng đêm.
+- `src/components/Shell.tsx`, `src/App.tsx`: gắn nút ở header và màn hình tạo hồ sơ.
+  `src/components/ui.tsx`: thêm SVG mặt trời; các icon và xử lý hiện có giữ nguyên.
+- `src/app.css`: bổ sung palette trăng ngày, màu form/thẻ/chat/modal và bố cục nút ở màn hình hẹp.
+  Các quy tắc theme đêm cũ không bị thay thế; giảm chuyển động và focus bàn phím được giữ.
+- `npm run check` trong `app/` và thư mục dự án cha: pass. `git diff --check`: pass.
+- Playwright chạy với browser context riêng, cấu hình Firebase thử chỉ tồn tại trong response
+  được chặn/thay thế ở trình duyệt. Không sửa file cấu hình, không gọi Firebase thật.
+  Hồ sơ thử chỉ lưu trong context này; cảnh báo thiếu kết nối trong ảnh là trạng thái thử có chủ đích.
+- Kiểm tra 56 tổ hợp: 6 route chính + onboarding, 2 theme, 360/390/768/1440px;
+  sau khi nội dung và viewport ổn định, không tràn ngang.
+- Chuyển bằng chuột/Space, focus rõ; cả hai theme giữ sau reload và qua bước tạo hồ sơ.
+  Giá trị theme không hợp lệ về mặc định; khi storage bị chặn vẫn đổi theme trong phiên được.
+  `prefers-reduced-motion` được tôn trọng; popup chat mở và đóng bằng Escape.
+- Không có page error hoặc console error/warning trong lượt kiểm tra các route và popup.
+- Sáu màu chữ chính trên sáu nền sáng đã đo đạt tối thiểu 4,65:1; nút chính đạt 7,27:1.
+  Đây là kiểm tra các cặp token, không phải chứng nhận WCAG cho toàn bộ ứng dụng.
+- 76 file ngoài phạm vi sửa có hash tổng trước/sau giống nhau:
+  `f4ea62b8a2f1ce3d9747c2cd8d91149720882190ddb0a32fca1312c1686e7de9`.
+  Bao gồm bản HTML/script cũ, Firebase/rules, tests, dependency/config và logic React không liên quan.
+- Ảnh: `artifacts/theme-before-1440.png`, `theme-day-1440.png`, `theme-night-1440.png`,
+  `theme-day-390.png`, `theme-night-390.png`, `theme-day-chat-390.png`,
+  `theme-day-room-390.png`, `theme-day-profile-390.png`, `theme-day-onboarding-390.png`.
+- Chưa chạy lại luồng hai người/emulator, gửi tin thật, gameplay hoặc PWA cài trên thiết bị;
+  đợt này chỉ kiểm tra theme và tương tác giao diện, không push/deploy.
+
+## Khóa Không gian của bạn — 2026-11-10
+
+- `src/pages/Profile.tsx`: khóa hai công tắc bằng `disabled`, thêm nhãn “Đang phát triển”
+  và mô tả trợ năng; đổi “Hiệu ứng trái tim chung” thành “Hiệu ứng động”, chú thích “Tắt hiệu ứng động.”
+- `src/app.css`: giảm độ nổi và đổi con trỏ cho công tắc bị khóa; không thay logic nhạc/hiệu ứng phía sau.
+- `npm run check` tại `app/` và thư mục cha: pass.
+- Playwright trên Vite đang chạy, context riêng chặn Firebase thật: cả hai công tắc không đổi trạng thái
+  khi bấm chuột và không nhận focus bàn phím. Không có page error/console error trong lượt kiểm tra.
+- Hai theme × 360/390/768/1440px: 8 trường hợp không tràn ngang; đã xem ảnh sáng/tối 390px.
+- Lưu hồ sơ thử vào storage riêng và tải lại: pass; liên kết “Khám phá” ở thẻ bên cạnh: pass.
+  Bước chờ toast lưu hồ sơ hết thời gian; kết quả lưu được xác nhận bằng storage và giá trị form sau reload.
+- 80 file ngoài phạm vi mã giao diện lần này có hash trước/sau giống nhau:
+  `0ccc8081d25ce022d564e4b810411943190f389001056ab4191b3e2668c5a101`.
+  Firebase, rules, cấu hình, dependency, tests và các thay đổi theme trước đó giữ nguyên.
+- Ảnh: `artifacts/space-before-390.png`, `space-day-390.png`, `space-night-390.png`.
+- Không kiểm thử đa người dùng/emulator, không ghi Firebase thật, không push/deploy.
