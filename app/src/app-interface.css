@@ -1,6 +1,10 @@
 /* App screens: one header, five tabs, concise actions and predictable detail routes. */
 .app-interface{--app-tint:color-mix(in srgb,var(--lavender) 12%,var(--surface));--app-gold:color-mix(in srgb,var(--gold) 10%,var(--surface));font-size:16px}
 .app-interface .shell-footer{display:none}
+.app-interface .shell-sidebar{overflow-y:auto;scrollbar-width:thin}
+.app-interface .shell-sidebar>.desktop-nav,.app-interface .sidebar-bottom{flex-shrink:0}
+.app-interface .utility-nav-label{margin-top:24px;margin-bottom:12px}
+.app-interface .sidebar-bottom{padding-top:24px}
 .app-interface .main-content{max-width:1120px;padding-top:24px}
 .app-interface .page-stack{gap:24px}
 .app-interface .screen-title{font-size:18px;font-weight:600;color:var(--text)}

@@ -28,7 +28,7 @@ import {
   type Database,
   type DataSnapshot,
 } from 'firebase/database';
-import type { Avatar, ConnectionState, Invite, Member, Message, OpenRoom, Person, Profile, RoomMeta, RoomRef, Wallet } from '../types';
+import type { Avatar, ConnectionState, Invite, Member, Message, OpenRoom, Person, Profile, RoomMeta, RoomRef, SupportCategory, SupportMessage, SupportThread, Wallet } from '../types';
 
 // Keep the legacy Firebase app name so an existing browser retains its anonymous UID
 // and the room membership associated with that UID when the React app replaces it.
@@ -608,6 +608,57 @@ export async function transactGame(room: RoomRef, game: 'truth' | 'xo', mutator:
   const { db } = requireConnection();
   const result = await runTransaction(ref(db, `coupleGames/${roomPath(room)}/${game}`), current => mutator(current), { applyLocally: false });
   return result.committed;
+}
+
+function supportUid(uid: string) {
+  if (!uid || uid.length > 128 || /[.#$\[\]/]/.test(uid)) throw new Error('Cuộc trò chuyện không hợp lệ.');
+  return uid;
+}
+
+export function subscribeSupportAdmin(callback: (admin: boolean) => void, onError: (message: string) => void) {
+  const { db, uid } = requireConnection();
+  return onValue(ref(db, `supportAdmins/${uid}`), snapshot => callback(snapshot.val() === true), error => onError(humanError(error)));
+}
+
+export function subscribeSupportMessages(userUid: string, callback: (value: SupportMessage[]) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  return onValue(query(ref(db, `supportMessages/${supportUid(userUid)}`), orderByChild('at'), limitToLast(100)), snapshot => {
+    const values: SupportMessage[] = [];
+    snapshot.forEach(child => { values.push({ ...child.val(), id: child.key! }); });
+    callback(values.sort((a, b) => a.at - b.at || a.id.localeCompare(b.id)));
+  }, error => onError(humanError(error)));
+}
+
+export function subscribeSupportInbox(callback: (value: SupportThread[]) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  return onValue(query(ref(db, 'supportThreads'), orderByChild('updatedAt'), limitToLast(50)), snapshot => {
+    callback((Object.values(snapshot.val() || {}) as SupportThread[]).sort((a, b) => b.updatedAt - a.updatedAt || a.uid.localeCompare(b.uid)));
+  }, error => onError(humanError(error)));
+}
+
+export function subscribeSupportThread(userUid: string, callback: (value: SupportThread | null) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  return onValue(ref(db, `supportThreads/${supportUid(userUid)}`), snapshot => callback(snapshot.val()), error => onError(humanError(error)));
+}
+
+export async function sendSupportMessage(userUid: string, profile: Profile, text: string, category: SupportCategory, asAdmin = false) {
+  const { db, uid } = requireConnection();
+  const target = supportUid(userUid), clean = text.trim();
+  if (!clean || clean.length > 1500) throw new Error('Tin nhắn cần từ 1 đến 1500 ký tự.');
+  if (!['help', 'bug', 'feature'].includes(category)) throw new Error('Chọn nội dung cần hỗ trợ.');
+  try {
+    const name = cleanName(profile);
+    const previous = asAdmin ? (await get(ref(db, `supportThreads/${target}`))).val() as SupportThread | null : null;
+    if (asAdmin && !previous) throw new Error('Cuộc trò chuyện này chưa có tin nhắn.');
+    const id = push(ref(db, `supportMessages/${target}`)).key!;
+    const sender = asAdmin ? 'admin' : 'user';
+    const topic = previous?.category || category;
+    // One commit keeps the private inbox preview and its append-only message consistent.
+    await update(ref(db), {
+      [`supportMessages/${target}/${id}`]: { uid, name, text: clean, category: topic, sender, at: serverTimestamp() },
+      [`supportThreads/${target}`]: { uid: target, name: previous?.name || name, category: topic, lastSender: sender, lastText: clean, lastMessageId: id, updatedAt: serverTimestamp() },
+    });
+  } catch (error) { throw new Error(humanError(error)); }
 }
 
 export function subscribeHearts(callback: (enabled: boolean) => void) {

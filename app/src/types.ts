@@ -49,6 +49,28 @@ export interface Message {
   sticker?: string;
 }
 
+export type SupportCategory = 'help' | 'bug' | 'feature';
+
+export interface SupportMessage {
+  id: string;
+  uid: string;
+  name: string;
+  text: string;
+  at: number;
+  sender: 'user' | 'admin';
+  category: SupportCategory;
+}
+
+export interface SupportThread {
+  uid: string;
+  name: string;
+  updatedAt: number;
+  lastMessageId: string;
+  lastText: string;
+  lastSender: 'user' | 'admin';
+  category: SupportCategory;
+}
+
 export interface Person {
   uid: string;
   name: string;

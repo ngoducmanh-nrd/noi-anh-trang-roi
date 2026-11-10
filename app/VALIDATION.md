@@ -360,3 +360,44 @@
 - Cần Publish Rules mới có `roomPresence` rồi cập nhật/reload cả hai trình duyệt để dùng sửa lỗi.
   Mất mạng đột ngột vẫn có độ trễ phát hiện; không tuyên bố đồng bộ tức thời tuyệt đối. Chưa Publish
   Rules, commit/push/deploy. Firebase config/auth/khóa lưu/schema chat-game giữ nguyên.
+
+## Chat Hỗ trợ & góp ý trong website — 2026-11-11
+
+- Theo lựa chọn của chủ dự án, làm chat ngay trên website thay vì dẫn ra Zalo/Messenger.
+  `pages/Support.tsx` + `Support.css` thêm `/support` (luồng riêng của mỗi UID), `/support/inbox`
+  và `/support/inbox/:threadUid` (quản trị nhận/trả lời). Chọn Hỗ trợ/Báo lỗi/Góp ý tính năng,
+  tối đa 1500 ký tự, hiển thị 100 tin mới nhất; inbox lấy 50 cuộc trò chuyện cập nhật mới nhất.
+- `App.tsx` lazy-load trang/CSS, ẩn nút nổi chat chung trên màn hỗ trợ. `Shell.tsx` gom thêm nhóm
+  Tiện ích & hỗ trợ ở desktop; `Profile.tsx` có nhóm tương ứng cho mobile. Giữ nguyên 5 tab,
+  Back từ chat người dùng về Cá nhân, từ phản hồi quản trị về danh sách. Sidebar cuộn được ở màn thấp.
+- `lib/firebase.ts` thêm subscription và ghi nguyên tử tin nhắn/preview; `types.ts` thêm kiểu hỗ trợ.
+  Các node mới: `supportMessages/{uid}/{messageId}`, `supportThreads/{uid}`, `supportAdmins/{uid}`.
+  Tin chỉ thêm mới, không cho client sửa/xóa lịch sử; index phải khớp đúng tin mới trong cùng batch.
+- Rules chỉ cho chủ UID và quản trị đọc luồng; người thường không đọc toàn inbox hoặc luồng khác,
+  không giả vai quản trị hoặc tự cấp quyền. Quản trị hỗ trợ cũng không được tự cấp quyền hay đọc
+  phòng riêng khác. Cấp/thu hồi quyền chỉ qua Console, gắn UID trình duyệt hiện có, không thêm
+  private key hoặc đổi Anonymous Auth. Hướng dẫn cấp quyền trên website thật ở `README.md`.
+- `npm test`: **33/33 pass**, gồm 5 bài hỗ trợ mới (riêng tư, giả mạo/tự nâng quyền, phản hồi/thu hồi,
+  batch index-message và lịch sử bất biến, giới hạn nội dung/category/timestamp/field lạ).
+- Hồi quy Playwright cuối: **16/16 pass (1,7 phút)**: support 2, rooms/presence 5, Firebase service 3,
+  luồng app hai người 1, avatar 1, icon 3, real-routes 1. Giữ nguyên các test cũ; chỉ thêm support.spec.ts
+  và các bài Rules mới. Đã kiểm tra gửi/nhận hai chiều, reload giữ lịch sử, đổi category, XSS hiển thị
+  dạng chữ, đọc luồng người khác bị chặn, thu hồi quyền làm inbox đóng, offline giữ nội dung chưa gửi.
+- Matrix support: user/inbox/reply × hai theme thật (assert data-theme) × 360×800, 390×844,
+  768×1024, 1440×1000, 844×390; không tràn ngang; nút gửi >=44px và nằm trong viewport ở các khổ
+  cao >=800px. Matrix dùng reduced-motion; luồng gửi/nhận riêng dùng motion mặc định.
+  Ảnh `artifacts/support-{night,day}-{390,1440}-{user,inbox,reply}.png`; đã xem sáng/tối mobile/desktop.
+  Có safe-area CSS cho màn hỗ trợ; chưa xác nhận notch/bàn phím ảo trên thiết bị vật lý.
+- Lượt test đầu gặp input radio ẩn và dev server hết thời gian chạy: chuyển test sang bấm label
+  thật kèm assert checked, mở lại dev server. Lượt nhóm đầu 14/16 pass do dữ liệu emulator cũ trùng
+  tên, sau đó scope selector theo UID/href (không dùng .first) và chạy lại 16/16 pass. Không yếu hóa
+  assertion quyền riêng tư. Sửa cách test bật theme để assert trạng thái thực, không chỉ đặt tên ảnh.
+- Check/build pass; 5/5 game tests pass. Build vẫn có cảnh báo chunk chính >500kB (~1001kB,
+  gzip ~506kB), trang hỗ trợ có chunk riêng. Không thêm package/CDN, font, tracking hoặc dịch vụ ngoài.
+- Không sửa quản lý/xóa phòng, schema chat/game/hiện diện cũ, config Firebase, auth, localStorage cũ
+  hoặc deployment. Kiểm thử chỉ project demo và chặn Firebase thật; không có page error trong support.
+  Chưa kiểm thử production PWA hoặc thiết bị thật. Chưa Publish Rules, cấp quyền thật, commit/push/deploy.
+  Chưa có push notification/email, đính kèm, API chống spam hay tự dọn lịch sử hỗ trợ.
+- Rà cuối safe-area: support chạy lại 2/2 pass (47,1s). So sánh JSON Rules với HEAD xác nhận
+  mọi nhánh cũ giữ nguyên, chỉ thêm supportAdmins/supportThreads/supportMessages; diff/check sạch
+  với CRLF được nhận diện. Không đưa CLAUDE.md chưa theo dõi vào phạm vi thay đổi.

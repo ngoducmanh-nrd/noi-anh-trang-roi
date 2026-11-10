@@ -24,3 +24,21 @@ nên không áp dụng phần đó. Dùng kết quả đúng ngữ cảnh từ d
 Đã đọc `references/pro-rules.md` và mục 1–3 của `references/quick-reference.md`.
 
 Backend, schema, rules và cấu hình triển khai không thuộc đợt này.
+
+## Bổ sung Hỗ trợ & góp ý — 2026-11-11
+
+Theo yêu cầu mới, hỗ trợ là chat riêng ngay trong website, có hộp thư nhận/trả lời của quản trị.
+Phần chức năng này có Firebase service và Rules riêng; không triển khai quản lý/xóa phòng cùng lúc.
+
+- Giữ theme/font/icon hiện có; không đổi toàn bộ định hướng hoặc thêm CDN/dependency.
+- Desktop giữ nhóm điều hướng chính và thêm nhóm Tiện ích & hỗ trợ (Một chút vui, Hỗ trợ & góp ý).
+  Sidebar cuộn được ở màn thấp. Mobile giữ 5 tab, đặt tiện ích trong Cá nhân; trang hỗ trợ là màn chi tiết.
+- `/support` là một cuộc trò chuyện, 3 lựa chọn nội dung, cảnh báo không gửi bí mật; không dựng
+  trạng thái online, thời gian phản hồi hoặc biên nhận đã đọc giả. `/support/inbox` có danh sách
+  và khung trả lời trên desktop; mobile chọn danh sách rồi vào chat, Back về đúng danh sách.
+- Quyền quản trị được Rules kiểm tra bằng `supportAdmins/{uid}`, không dựa vào nút ẩn hoặc localStorage.
+  Trang bị chặn có mục thiết lập dành cho chủ website để sao chép UID; không cho tự cấp quyền.
+- Truy vấn design-system cho support trả ra hero/testimonials và màu hồng không phù hợp, không áp dụng.
+  Truy vấn product hẹp hơn gần mô hình inbox/email tối giản; chỉ dùng nguyên tắc danh sách + cuộc trò chuyện.
+  Giữ hướng đêm trăng đã duyệt. UX search dùng Back Button, Sticky Navigation và Mobile Keyboards;
+  áp dụng nút Back rõ, không thêm tab thứ sáu, composer không bị menu che trên điện thoại.

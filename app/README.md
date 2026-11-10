@@ -75,6 +75,39 @@ Trước khi đổi domain cần chủ động sao lưu kỷ niệm/hồ sơ và
 - Kiểm tra riêng: sau khi chạy emulator auth/database và dev server như bên dưới,
   `npx playwright test tests/rooms.spec.ts tests/firebase-service.spec.ts` trong `app/`.
 
+## Chat hỗ trợ và hộp thư quản trị
+
+- `/support`: mỗi UID có một cuộc trò chuyện riêng; chọn Cần hỗ trợ/Báo lỗi/Góp ý tính năng,
+  gửi văn bản tối đa 1500 ký tự và nhận phản hồi ngay trong website. Hiện 100 tin mới nhất.
+- `/support/inbox`: hộp thư dành cho quản trị, hiện 50 cuộc trò chuyện mới cập nhật gần nhất;
+  chọn một người để đọc/trả lời. Ghi chú Chờ phản hồi/Đã trả lời dựa trên người gửi tin cuối,
+  không phải biên nhận đã đọc. Không thêm thông báo đẩy, email hay kênh liên hệ ngoài website.
+- Desktop có nhóm **Tiện ích & hỗ trợ** trong sidebar; mobile giữ 5 tab, lối vào nằm trong Cá nhân.
+  Màn hỗ trợ có nút quay lại, không bị nút nổi chat chung che. CSS riêng được lazy-load cùng trang.
+- Dữ liệu mới: `supportMessages/{uid}/{messageId}` và `supportThreads/{uid}`. Tin nhắn và preview
+  được ghi nguyên tử; tin đã gửi không sửa/xóa qua client. Người dùng chỉ đọc/ghi luồng của mình;
+  quản trị chỉ có quyền hỗ trợ, không tự có quyền đọc phòng/chat riêng khác.
+
+### Cấp quyền nhận và trả lời cho chủ website
+
+1. Publish bản `../database.rules.json` mới, rồi phát hành frontend mới. Không mở quyền toàn database.
+2. Trên **website thật, đúng trình duyệt anh sẽ dùng quản lý**, mở `/support/inbox`.
+   Mở **Thiết lập dành cho chủ website** rồi bấm **Sao chép mã thiết bị**.
+3. Trong Firebase Console → Realtime Database → Data, thêm một con tại
+   `supportAdmins/<mã thiết bị vừa sao chép>` với giá trị **boolean `true`**, không phải chuỗi `"true"`.
+   Chỉ thêm đúng mục đó, không thay toàn bộ dữ liệu. Không dùng UID của emulator hoặc localhost.
+4. Hộp thư sẽ mở tự động khi quyền được nhận; sau đó trang hỗ trợ có nút **Hộp thư hỗ trợ**.
+   Muốn thu hồi, xóa mục của UID đó trong Console. Muốn dùng thiết bị khác, cấp riêng UID của thiết bị đó.
+
+`supportAdmins` không cho bất kỳ client nào tự ghi, kể cả client quản trị; chỉ người có quyền quản lý
+Firebase mới cấu hình được. Không cần thêm mật khẩu hoặc private key vào frontend. Đây là quyền gắn
+với Anonymous UID hiện tại: xóa dữ liệu trình duyệt/đổi origin có thể mất phiên, cần cấp lại cho UID mới.
+Lịch sử hỗ trợ vẫn lưu trên Firebase nhưng người dùng mất UID không tự lấy lại được luồng cũ.
+
+Tính năng dùng RTDB hiện có (đọc/ghi/lưu trữ tính vào hạn mức), không thêm dependency/dịch vụ ngoài.
+Chưa có API chống spam hoặc tự dọn lịch sử hỗ trợ; không thay đổi chính sách lưu/xóa phòng trong đợt này.
+Kiểm tra riêng sau khi mở emulator và dev server: `npx playwright test tests/support.spec.ts`.
+
 ## Build và xem bản production
 
 ```powershell

@@ -260,6 +260,46 @@
         }
       }
     },
+    "supportAdmins": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": false
+      }
+    },
+    "supportThreads": {
+      ".read": "auth != null && root.child('supportAdmins').child(auth.uid).val() === true",
+      ".indexOn": ["updatedAt"],
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && newData.exists() && (auth.uid === $uid || (root.child('supportAdmins').child(auth.uid).val() === true && data.exists()))",
+        ".validate": "newData.hasChildren(['uid','name','updatedAt','lastMessageId','lastText','lastSender','category']) && !root.child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).exists() && newData.parent().parent().child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).child('uid').val() === auth.uid && newData.child('updatedAt').val() === newData.parent().parent().child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).child('at').val() && newData.child('lastText').val() === newData.parent().parent().child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).child('text').val() && newData.child('lastSender').val() === newData.parent().parent().child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).child('sender').val() && newData.child('category').val() === newData.parent().parent().child('supportMessages').child($uid).child(newData.child('lastMessageId').val()).child('category').val()",
+        "uid": { ".validate": "newData.val() === $uid" },
+        "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 26 && (auth.uid === $uid || newData.val() === data.val())" },
+        "updatedAt": { ".validate": "newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 60000" },
+        "lastMessageId": { ".validate": "newData.isString() && newData.val().matches(/^[-A-Za-z0-9_]{20}$/)" },
+        "lastText": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 1500" },
+        "lastSender": { ".validate": "newData.val() === 'user' || newData.val() === 'admin'" },
+        "category": { ".validate": "newData.val() === 'help' || newData.val() === 'bug' || newData.val() === 'feature'" },
+        "$other": { ".validate": false }
+      }
+    },
+    "supportMessages": {
+      "$uid": {
+        ".read": "auth != null && (auth.uid === $uid || root.child('supportAdmins').child(auth.uid).val() === true)",
+        ".indexOn": ["at"],
+        "$message": {
+          ".write": "auth != null && !data.exists() && newData.exists() && ((auth.uid === $uid && newData.child('sender').val() === 'user') || (root.child('supportAdmins').child(auth.uid).val() === true && newData.child('sender').val() === 'admin'))",
+          ".validate": "newData.hasChildren(['uid','name','text','at','sender','category']) && $message.matches(/^[-A-Za-z0-9_]{20}$/) && newData.parent().parent().parent().child('supportThreads').child($uid).child('lastMessageId').val() === $message",
+          "uid": { ".validate": "newData.val() === auth.uid" },
+          "name": { ".validate": "newData.isString() && newData.val().length >= 2 && newData.val().length <= 26" },
+          "text": { ".validate": "newData.isString() && newData.val().length >= 1 && newData.val().length <= 1500" },
+          "at": { ".validate": "newData.isNumber() && newData.val() >= now - 300000 && newData.val() <= now + 60000" },
+          "sender": { ".validate": "newData.val() === 'user' || newData.val() === 'admin'" },
+          "category": { ".validate": "newData.val() === 'help' || newData.val() === 'bug' || newData.val() === 'feature'" },
+          "$other": { ".validate": false }
+        }
+      }
+    },
     "globalChat": {
       "messages": {
         ".read": "auth != null",

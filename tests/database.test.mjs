@@ -269,3 +269,66 @@ test('matched room presence uses the same membership boundary without altering t
   await assertSucceeds(db('alice').ref(roomPresence('alice',sessionA,'selectedRooms')).remove());
   assert.equal((await db('bob').ref('selectedRooms/'+code+'/members').once('value')).numChildren(),2);
 });
+
+const grantSupportAdmin = () => env.withSecurityRulesDisabled(c => c.database().ref('supportAdmins/admin').set(true));
+function supportBatch(from = 'alice', target = 'alice', change = {}, previewChange = {}) {
+  const id = db(from).ref('supportMessages/'+target).push().key;
+  const value = {uid:from,name:from==='admin'?'Quản trị':'Alice',text:'Mình cần hỗ trợ.',at:Date.now(),sender:from==='admin'?'admin':'user',category:'help',...change};
+  const preview = {uid:target,name:'Alice',updatedAt:value.at,lastMessageId:id,lastText:value.text,lastSender:value.sender,category:value.category,...previewChange};
+  return {id,value,patch:{['supportMessages/'+target+'/'+id]:value,['supportThreads/'+target]:preview}};
+}
+test('support chat is private to its author and privileged support admins', async () => {
+  const sent = supportBatch();
+  await assertSucceeds(db('alice').ref().update(sent.patch));
+  await assertSucceeds(db('alice').ref('supportMessages/alice').once('value'));
+  await assertSucceeds(db('alice').ref('supportThreads/alice').once('value'));
+  await assertFails(db('bob').ref('supportMessages/alice').once('value'));
+  await assertFails(db('bob').ref('supportThreads/alice').once('value'));
+  await assertFails(db().ref('supportMessages/alice').once('value'));
+  await assertFails(db('alice').ref('supportThreads').once('value'));
+  await grantSupportAdmin();
+  await assertSucceeds(db('admin').ref('supportThreads').orderByChild('updatedAt').limitToLast(50).once('value'));
+  await assertSucceeds(db('admin').ref('supportMessages/alice').once('value'));
+});
+test('support users cannot self-promote, impersonate admins or send into another users thread', async () => {
+  await assertSucceeds(db('alice').ref('supportAdmins/alice').once('value'));
+  await assertFails(db('alice').ref('supportAdmins/alice').set(true));
+  await assertFails(db('alice').ref('supportAdmins').once('value'));
+  await assertFails(db('alice').ref().update(supportBatch('alice','bob').patch));
+  await assertFails(db('alice').ref().update(supportBatch('alice','alice',{sender:'admin'}).patch));
+  await assertFails(db('alice').ref().update(supportBatch('alice','alice',{uid:'admin'}).patch));
+  await assertFails(db().ref().update(supportBatch().patch));
+});
+test('support admins reply without acquiring room access or permission to grant admin roles', async () => {
+  await db('alice').ref().update(supportBatch().patch);
+  await grantSupportAdmin();
+  const reply = supportBatch('admin');
+  await assertSucceeds(db('admin').ref().update(reply.patch));
+  assert.equal((await db('alice').ref('supportMessages/alice/'+reply.id+'/sender').once('value')).val(),'admin');
+  await assertFails(db('admin').ref('supportAdmins/bob').set(true));
+  await assertFails(db('admin').ref().update(supportBatch('admin','alice',{}, {name:'Fake'}).patch));
+  await assertFails(db('admin').ref().update(supportBatch('admin','bob').patch));
+  await createRoom();
+  await assertFails(db('admin').ref('rooms/'+code).once('value'));
+  await env.withSecurityRulesDisabled(c=>c.database().ref('supportAdmins/admin').remove());
+  await assertFails(db('admin').ref('supportMessages/alice').once('value'));
+  await assertFails(db('admin').ref().update(supportBatch('admin').patch));
+});
+test('support inbox previews and messages must be created together and cannot rewrite history', async () => {
+  const first = supportBatch();
+  await assertFails(db('alice').ref('supportMessages/alice/'+first.id).set(first.value));
+  await assertFails(db('alice').ref('supportThreads/alice').set(first.patch['supportThreads/alice']));
+  await assertFails(db('alice').ref().update(supportBatch('alice','alice',{}, {lastText:'Different'}).patch));
+  await assertFails(db('alice').ref().update(supportBatch('alice','alice',{}, {lastMessageId:sessionA}).patch));
+  await assertSucceeds(db('alice').ref().update(first.patch));
+  await assertFails(db('alice').ref('supportMessages/alice/'+first.id+'/text').set('Changed'));
+  await assertFails(db('alice').ref('supportMessages/alice/'+first.id).remove());
+  await assertFails(db('alice').ref('supportThreads/alice').remove());
+  await assertFails(db('alice').ref('supportThreads/alice/lastText').set('Forged'));
+});
+test('support chat validates message sizes, categories, timestamps and unrecognized fields', async () => {
+  for (const change of [{text:''},{text:'x'.repeat(1501)},{at:0},{at:Date.now()+86400000},{category:'other'},{extra:true},{name:'A'}]) await assertFails(db('alice').ref().update(supportBatch('alice','alice',change).patch));
+  await assertFails(db('alice').ref().update(supportBatch('alice','alice',{}, {extra:true}).patch));
+  await assertSucceeds(db('alice').ref().update(supportBatch('alice','alice',{category:'bug'}).patch));
+  await assertSucceeds(db('alice').ref().update(supportBatch('alice','alice',{category:'feature',text:'Mình muốn thêm tính năng.'}).patch));
+});
