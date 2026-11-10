@@ -1,6 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 import { localKey } from '../state/AppContext';
 import { Icon } from './ui';
+import { AnimateIcon } from '@animate-ui/react/icons';
 
 type Mode = 'night' | 'day';
 
@@ -22,7 +23,7 @@ export default function ThemeToggle() {
   }, [mode]);
   const day = mode === 'day';
   return (
-    <button
+    <AnimateIcon asChild animateOnHover animateOnTap completeOnStop><button
       type="button"
       className="theme-toggle"
       aria-pressed={day}
@@ -31,6 +32,6 @@ export default function ThemeToggle() {
       onClick={() => setMode(current => current === 'day' ? 'night' : 'day')}>
       <Icon name={day ? 'sun' : 'moon'} size={18} />
       <span aria-hidden="true">{day ? 'Sáng' : 'Tối'}</span>
-    </button>
+    </button></AnimateIcon>
   );
 }

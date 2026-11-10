@@ -104,3 +104,8 @@
 [data-theme="day"] .onboard-moon{box-shadow:0 0 90px #fff3cc80,0 0 190px #fff3cc40}
 [data-theme="day"] .onboard-orbit{border-color:#8b88af55}
 [data-theme="day"] .onboard-orbit:after{background:var(--lavender);border-color:var(--tint-lavender)}
+.avatar-preset-grid{gap:12px}
+.avatar-choice.avatar-preset{width:72px;height:72px;padding:3px;overflow:hidden;border-radius:18px;flex:none}
+.avatar-preset img{display:block;width:100%;height:100%;object-fit:cover;border-radius:13px}
+.avatar-choice.avatar-preset.selected{outline:2px solid var(--lavender);outline-offset:2px}
+@media(max-width:510px){.avatar-preset-grid{gap:10px}.avatar-choice.avatar-preset{width:60px;height:60px;border-radius:15px}.avatar-preset img{border-radius:10px}}

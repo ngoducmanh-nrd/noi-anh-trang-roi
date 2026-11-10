@@ -143,3 +143,67 @@
   Firebase, rules, cấu hình, dependency, tests và các thay đổi theme trước đó giữ nguyên.
 - Ảnh: `artifacts/space-before-390.png`, `space-day-390.png`, `space-night-390.png`.
 - Không kiểm thử đa người dùng/emulator, không ghi Firebase thật, không push/deploy.
+
+## Animate UI Hugeicons — 2026-11-10
+
+- Thay bộ icon dùng chung bằng 35 component Hugeicons chính thức, ghim nguồn tại commit
+  `22a9236ae107328f8564edb7e3299375da3247af`; giữ giấy phép MIT + Commons Clause và manifest SHA-256.
+- Nút dùng chung, liên kết thẻ trang chủ, điều hướng và nút đổi theme kích hoạt animation trên toàn vùng thao tác.
+  Giữ class callback của React Router qua adapter riêng để không mất bố cục/trạng thái active.
+- `npm run build`: pass (bao gồm TypeScript); còn cảnh báo chunk chính khoảng 533 kB.
+  Chunk UI chứa icon/motion khoảng 213 kB, gzip 64 kB; không nhập toàn bộ danh mục icon.
+- `npm audit --omit=dev`: 0 lỗ hổng. `git diff --check`: pass.
+- Playwright `tests/icons.spec.ts`: 3 bài pass, kiểm tra animation từ toàn liên kết,
+  giảm chuyển động, điều hướng bằng chạm và lưu theme sau reload.
+- Kiểm tra icon trang trí có `aria-hidden`, không nhận focus và không gây page error
+  trên sáu route ở hai theme. Ảnh desktop 1440px và mobile 390px ở
+  `artifacts/hugeicons-{night,day}-{desktop,mobile}.png`; đã xem ảnh thật để sửa bố cục.
+- Trang chủ không tràn ngang ở 360/390/768/1440px trong cả hai theme.
+- Không sửa cấu hình Firebase/rules, logic dữ liệu/game, bản HTML cũ hoặc deployment.
+  Kiểm thử dùng cấu hình riêng tại trình duyệt và chặn Firebase thật; không chạy lại luồng hai người/emulator.
+- Chưa push/deploy.
+
+## Bố cục ứng dụng từ ảnh tham khảo — 2026-11-10
+
+- Đã áp dụng skill `D:/SKILL code/ui-ux-pro-max-final/ui-ux-pro-max/SKILL.md`,
+  đọc checklist và truy vấn hướng thiết kế/điều hướng. Quyết định áp dụng trong `DESIGN.md`.
+- `Home.tsx`: hồ sơ/xu ở đầu, banner trăng ngang, hai ô Phòng đôi/Tìm người và nhóm lối tắt.
+  `Profile.tsx`: thẻ cá nhân và danh sách mục; form chuyển vào `/profile/edit`.
+  `App.tsx`, `Shell.tsx`: `/chat`, trạng thái chưa đọc, header/quay lại và tab theo ngữ cảnh.
+  `main.tsx` nạp CSS bổ sung `app-interface.css`.
+- `npm run check` trong app và thư mục cha: pass; `npm run build`: pass.
+  Vẫn có cảnh báo chunk chính khoảng 986 kB (gzip 500 kB), do phụ thuộc/ảnh inline sẵn có.
+- Một lượt Playwright tuần tự: 9/9 pass (app-interface, app, avatars, icons).
+  Bao gồm hai người tạo/vào phòng đúng và sai mật khẩu, nhắn tin/sticker, Thật hay Thách,
+  XO, kỷ niệm, chat chung/chưa đọc, ghép đôi và rời phòng trên emulator `demo-inlove-owned`.
+  Test chat cũ đã đổi selector từ modal sang route, giữ các kiểm tra đồng bộ/chưa đọc.
+- Matrix giao diện: 8 route × 2 theme × 6 viewport (360×800, 375×812, 390×844,
+  768×1024, 1440×1000, 844×390). Không tràn ngang, composer chat trong viewport,
+  tab ẩn ở chat mobile, hai ô chính Trang chủ nằm trong màn hình đầu ở 390×844.
+  Chạy lại 2/2 bài app-interface sau khi bổ sung chờ nội dung route: pass; ảnh không còn trạng thái tải.
+- Kiểm tra chọn/lưu avatar sau khi tách màn sửa, browser Back, nút quay lại, Escape,
+  sticker mở/đóng và focus bàn phím: pass. Icon vẫn hỗ trợ giảm chuyển động.
+- Đo 5 cặp chữ/nền của thẻ chức năng và hàng danh sách: tối thiểu 6,17:1 ở tối,
+  5,09:1 ở sáng. Không phải đánh giá WCAG toàn bộ ứng dụng.
+- Ảnh `artifacts/app-{night,day}-{390,1440}-{home,profile,profile-edit,chat}.png`;
+  có ảnh riêng `app-reviewed-profile-day-390.png`. Cảnh báo kết nối trong ảnh là fixture chủ đích,
+  không dùng cấu hình Firebase thật trong các context kiểm tra giao diện.
+- `git diff --exit-code` trên public cũ, rules, Firebase/config, service/state, chat/game logic:
+  không có thay đổi. Không sửa schema hoặc dữ liệu thật.
+- Chưa kiểm tra trên điện thoại vật lý, bàn phím ảo, cỡ chữ hệ điều hành hoặc cài PWA lại;
+  không push/deploy.
+
+## Avatar anime đã duyệt — 2026-11-10
+
+- Tách 16 ảnh WebP 288×288 vào `src/assets/avatars/` từ bảng nhân vật được chủ dự án chọn.
+  `ProfileForm.tsx` dùng bộ này thay tám lựa chọn emoji; CSS thêm ô ảnh và viền chọn.
+- Giữ avatar cũ, tải ảnh và ảnh URL. Preset dùng `kind: data` hiện có, không đổi schema,
+  Firebase, rules hoặc cấu hình; không lưu đường dẫn phụ thuộc domain.
+- `npm run check`, `npm run build`: pass. Build còn cảnh báo chunk chính >500 kB;
+  ảnh inline làm chunk chính tăng lên khoảng 986 kB (gzip 500 kB).
+- `tests/avatars.spec.ts`: 1 bài pass; đủ 16 ảnh khác nhau tải thành công, chọn/xem trước,
+  lưu rồi reload giữ lựa chọn, avatar emoji cũ vẫn hiện, tải ảnh riêng vẫn hoạt động.
+- Hai theme × 360/390/768/1440px: không tràn ngang. Đã xem ảnh mobile thực tế;
+  ảnh kiểm tra ở `artifacts/avatars-{night,day}-{390,1440}.png`.
+- Test dùng cấu hình trình duyệt riêng, chặn Firebase thật; không có page error.
+  Chưa kiểm thử lại chat/ghép đôi hai người với emulator. Không push/deploy.

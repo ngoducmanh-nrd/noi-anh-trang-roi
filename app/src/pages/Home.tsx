@@ -1,13 +1,28 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { AnimatedLink as Link } from '../components/AnimatedLink';
 import { useApp } from '../state/AppContext';
 import { subscribeWallet } from '../lib/firebase';
 import { AvatarView, Icon } from '../components/ui';
 import MoonOrbit from '../components/MoonOrbit';
-export default function Home(){const {profile,room,connection,uid}=useApp();const [walletTotal,setWalletTotal]=useState(0);useEffect(()=>{if(!uid)return;return subscribeWallet(wallet=>setWalletTotal(wallet.total))},[uid]);return <div className="page-stack">
-  <section className="hero-card"><div className="hero-copy"><span className="eyebrow"><Icon name="star" size={14}/> MỘT KHOẢNG TRỜI RIÊNG</span><h1>Đêm nay,<br/>mình kể nhau nghe.</h1><p>Chậm lại một chút. Có những điều chỉ cần một người lắng nghe, và một nơi đủ bình yên để bắt đầu.</p><div className="hero-actions"><Link className="button button-primary" to="/room">{room?'Về phòng của mình':'Tạo một phòng riêng'}<Icon name="arrowRight" size={18}/></Link><Link className="button button-secondary" to="/discover">Tìm một người đồng điệu</Link></div><div className="hero-footnote"><span className="status-dot"/> Một lời chào có thể là khởi đầu của điều đẹp đẽ.</div></div><div className="hero-art" aria-hidden="true"><MoonOrbit/><span className="sky-star star-one">✦</span><span className="sky-star star-two">✧</span><span className="sky-star star-three">·</span><div className="moon-caption">somewhere, under the same moon.</div></div></section>
-  <div className="surface-header"><div><span className="eyebrow">DÀNH CHO BẠN</span><h2 className="section-title">Chào {profile?.name}, hôm nay bạn thế nào?</h2></div><span className="text-muted text-small">Cứ là chính mình thôi.</span></div>
-  <section className="surface home-profile" aria-label="Hồ sơ của bạn"><div className="home-profile-main"><AvatarView avatar={profile?.avatar} name={profile?.name||''} size="lg"/><div className="home-profile-copy"><strong className="home-profile-name">{profile?.name||'Bạn của trăng'}</strong><span className="home-profile-status"><span className={`status-dot ${connection==='online'?'':'dim'}`} aria-hidden="true"/>{connection==='online'?(profile?.relationship||'Đang ở dưới ánh trăng'):'Đang kết nối lại…'}</span></div></div><span className="home-profile-wallet" title="Số xu hiện có của bạn"><Icon name="star" size={15} aria-hidden="true"/><strong>{walletTotal.toLocaleString('vi-VN')}</strong><span>xu</span></span></section>
-  <div className="section-grid home-cards"><Link to="/room" className="surface feature-card"><div className="feature-icon"><Icon name="chat" size={23}/></div><span className="feature-step">01</span><span className="feature-tagline">Không gian riêng tư</span><h3>Chuyện của hai người</h3><p>Một căn phòng có mật khẩu, những tin nhắn và trò chơi chỉ dành cho mình.</p><span className="feature-link">{room?'Trở lại phòng':'Mở cửa căn phòng'}<Icon name="arrowRight" size={17}/></span></Link><Link to="/discover" className="surface feature-card"><div className="feature-icon lavender"><Icon name="users" size={23}/></div><span className="feature-step">02</span><span className="feature-tagline">Kết nối đồng điệu</span><h3>Một người cùng tần số</h3><p>Gặp những người đang ở đây. Gửi lời mời, rồi bắt đầu khi cả hai cùng sẵn sàng.</p><span className="feature-link">Khám phá những kết nối<Icon name="arrowRight" size={17}/></span></Link><Link to="/memories" className="surface feature-card"><div className="feature-icon gold"><Icon name="bookmark" size={23}/></div><span className="feature-step">03</span><span className="feature-tagline">Giữ lại điều đẹp</span><h3>Những điều muốn giữ</h3><p>Một ngày đáng nhớ, một câu chuyện nhỏ. Để yêu thương có chỗ ở lại.</p><span className="feature-link">Mở ngăn kỷ niệm<Icon name="arrowRight" size={17}/></span></Link></div>
-  <section className="surface evening-note"><Icon name="moon" size={28}/><blockquote>“Giữa một thế giới vội vàng,<br/>mong mình vẫn dành cho nhau một chút dịu dàng.”</blockquote><span className="eyebrow">NƠI ÁNH TRĂNG RƠI</span></section>
-</div>}
+
+export default function Home(){
+  const {profile,room,connection,uid}=useApp();
+  const [walletTotal,setWalletTotal]=useState(0);
+  useEffect(()=>{if(!uid)return;return subscribeWallet(wallet=>setWalletTotal(wallet.total))},[uid]);
+  return <div className="app-home page-stack">
+    <section className="dashboard-person" aria-label="Hồ sơ của bạn">
+      <Link to="/profile" className="dashboard-identity"><AvatarView avatar={profile?.avatar} name={profile?.name} size="lg"/><span><span className="text-muted">Chào bạn dưới trăng,</span><h1>{profile?.name||'Bạn của trăng'}</h1><span className="identity-status"><span className={`status-dot ${connection==='online'?'':'dim'}`}/>{connection==='online'?'Đang trực tuyến':'Chưa kết nối'}</span></span></Link>
+      <span className="dashboard-wallet" title="Số xu hiện có"><Icon name="star" size={18}/><strong>{walletTotal.toLocaleString('vi-VN')}</strong><span>xu</span></span>
+    </section>
+    <section className="moon-banner"><div><span className="eyebrow">MỘT KHOẢNG TRỜI RIÊNG</span><h2>Mình kể nhau nghe.</h2><p>Một lời chào, một chút dịu dàng.</p></div><div className="banner-moon" aria-hidden="true"><MoonOrbit/></div></section>
+    <section aria-labelledby="connect-title"><div className="app-section-heading"><h2 id="connect-title">Hẹn nhau dưới trăng</h2><Icon name="sparkles" size={18}/></div><div className="connect-grid">
+      <Link to="/room" className="connect-tile connect-private"><span className="connect-icon"><Icon name="chat" size={29}/></span><h3>Phòng đôi</h3><p>{room?'Căn phòng đang chờ bạn':'Một nơi chỉ có hai người'}</p><span className="connect-action">{room?'Về phòng':'Vào phòng'}<Icon name="arrowRight" size={18}/></span></Link>
+      <Link to="/discover" className="connect-tile connect-discover"><span className="connect-icon"><Icon name="users" size={29}/></span><h3>Tìm người</h3><p>Gặp một người đồng điệu</p><span className="connect-action">Khám phá<Icon name="arrowRight" size={18}/></span></Link>
+    </div></section>
+    <section aria-labelledby="moments-title"><div className="app-section-heading"><h2 id="moments-title">Góc nhỏ mỗi ngày</h2></div><div className="app-menu">
+      <Link to="/chat" className="app-menu-row"><span className="menu-icon"><Icon name="chat" size={23}/></span><span><strong>Chuyện dưới trăng</strong><small>Ghé chat chung, chào mọi người</small></span><Icon name="arrowRight" size={18}/></Link>
+      <Link to="/memories" className="app-menu-row"><span className="menu-icon gold"><Icon name="bookmark" size={23}/></span><span><strong>Kỷ niệm</strong><small>Giữ lại những điều đáng nhớ</small></span><Icon name="arrowRight" size={18}/></Link>
+      <Link to="/little-things" className="app-menu-row"><span className="menu-icon"><Icon name="sparkles" size={23}/></span><span><strong>Một chút vui</strong><small>Câu hỏi nhỏ, bói vui cùng nhau</small></span><Icon name="arrowRight" size={18}/></Link>
+    </div></section>
+  </div>;
+}

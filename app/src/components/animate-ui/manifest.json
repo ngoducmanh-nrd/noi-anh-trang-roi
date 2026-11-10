@@ -1,0 +1,254 @@
+{
+  "repository": "imskyleen/animate-ui",
+  "commit": "22a9236ae107328f8564edb7e3299375da3247af",
+  "license": "MIT + Commons Clause",
+  "mapping": {
+    "moon": "moon-02",
+    "sun": "sun-03",
+    "home": "home-03",
+    "heart": "favourite",
+    "chat": "message-circle",
+    "users": "users-round",
+    "game": "target-01",
+    "sparkles": "sparkles",
+    "plus": "add-01",
+    "arrowRight": "arrow-right-01",
+    "arrowLeft": "arrow-left-01",
+    "settings": "settings-02",
+    "calendar": "calendar",
+    "bookmark": "bookmark",
+    "send": "sent",
+    "close": "cancel-01",
+    "check": "check",
+    "copy": "copy-01",
+    "link": "link-01",
+    "logout": "logout-01",
+    "upload": "upload-01",
+    "image": "gallery-horizontal",
+    "music": "music-3",
+    "volume": "volume-high",
+    "more": "more-horizontal",
+    "shield": "shield-check",
+    "wifi": "wifi-01",
+    "offline": "wifi-off-01",
+    "download": "download-01",
+    "menu": "menu-01",
+    "trash": "trash",
+    "edit": "pencil-edit-02",
+    "search": "search-01",
+    "star": "star",
+    "refresh": "refresh"
+  },
+  "icons": [
+    {
+      "slug": "add-01",
+      "component": "Add01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/add-01/index.tsx",
+      "sha256": "5c4c5a93da4fe1915187b40f134a712f43d0886de10556842a6a281692bf807f"
+    },
+    {
+      "slug": "arrow-left-01",
+      "component": "ArrowLeft01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/arrow-left-01/index.tsx",
+      "sha256": "cfff1abf06b7b4b84216d5cc0d3f08bd24d285c3eda71c5d3ec3ff5bb0fc9e3d"
+    },
+    {
+      "slug": "arrow-right-01",
+      "component": "ArrowRight01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/arrow-right-01/index.tsx",
+      "sha256": "7f08b6f6db6175f4ea2489d87377a01823c7336cf7df3b39a59828903710e1c5"
+    },
+    {
+      "slug": "bookmark",
+      "component": "Bookmark",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/bookmark/index.tsx",
+      "sha256": "af0bab8175c1022c722ff2feff0416ffdfc60dd7f95f534fd4e3dcdd0df5309d"
+    },
+    {
+      "slug": "calendar",
+      "component": "Calendar",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/calendar/index.tsx",
+      "sha256": "8a52093215c4684029665f49a70f0132e67f7b6e5b165df0fbb1adfd0825e350"
+    },
+    {
+      "slug": "cancel-01",
+      "component": "Cancel01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/cancel-01/index.tsx",
+      "sha256": "6f6aae1dad679390a2da6aa45b197badf5ee350eb47c3f46282f07802fc65dfe"
+    },
+    {
+      "slug": "check",
+      "component": "Check",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/check/index.tsx",
+      "sha256": "0770ea7423f98c547a8772ae997dc506dff34bf98010554da96d33e54abe0d46"
+    },
+    {
+      "slug": "copy-01",
+      "component": "Copy01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/copy-01/index.tsx",
+      "sha256": "98d490f86ad2d41c3070b6ed0a91fa499636eb215b0cd0c91b8df342b52ccba5"
+    },
+    {
+      "slug": "download-01",
+      "component": "Download01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/download-01/index.tsx",
+      "sha256": "cba4921944379f32fb6c07e4643ae4b99d3a68c3831c0a340e37ec7ac2378c55"
+    },
+    {
+      "slug": "favourite",
+      "component": "Favourite",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/favourite/index.tsx",
+      "sha256": "7a1899952991bf4235133f5262c32b5f4a24b3111bc482257925207bd501d9df"
+    },
+    {
+      "slug": "gallery-horizontal",
+      "component": "GalleryHorizontal",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/gallery-horizontal/index.tsx",
+      "sha256": "46d6654c714fca3bd400fe4a77d6bd954f8ff5571b5172e000a66bd2805934fc"
+    },
+    {
+      "slug": "home-03",
+      "component": "Home03",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/home-03/index.tsx",
+      "sha256": "1205457d209c2cba3c6ef4149353664dd31e39ad41b4d6ffd95a4a925036d153"
+    },
+    {
+      "slug": "link-01",
+      "component": "Link01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/link-01/index.tsx",
+      "sha256": "b627ee56a5c19fce322277a22e78439d0b091031011818de6c578a3ed421f5d2"
+    },
+    {
+      "slug": "logout-01",
+      "component": "Logout01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/logout-01/index.tsx",
+      "sha256": "c2c2d4022c006c52ad78dce23f06c9da6efbdf535716f1dc39927999ef03d622"
+    },
+    {
+      "slug": "menu-01",
+      "component": "Menu01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/menu-01/index.tsx",
+      "sha256": "95f30061c10e9519a92c65c22ed39e3a2832996314b0ae19cd588590212033c6"
+    },
+    {
+      "slug": "message-circle",
+      "component": "MessageCircle",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/message-circle/index.tsx",
+      "sha256": "cc4cb1b64334a51c4b36061001164adff62e3cee4569b3925ad3fb09f207c824"
+    },
+    {
+      "slug": "moon-02",
+      "component": "Moon02",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/moon-02/index.tsx",
+      "sha256": "b584ec3cb04d339a42234ee06e4538e58aee199cdefd83a93b353ca315514715"
+    },
+    {
+      "slug": "more-horizontal",
+      "component": "MoreHorizontal",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/more-horizontal/index.tsx",
+      "sha256": "302883f45f8cbec26cc34a0ebe4a7b1a5e27ddf537d6cbcaed0d22524eb2f5b7"
+    },
+    {
+      "slug": "music-3",
+      "component": "Music3",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/music-3/index.tsx",
+      "sha256": "97ff7bc55f29b46a10b5ab026da28892b1b7177426e2fd710795bee9b88122d2"
+    },
+    {
+      "slug": "pencil-edit-02",
+      "component": "PencilEdit02",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/pencil-edit-02/index.tsx",
+      "sha256": "f7fb7aa2782829e70fe56150609af892f716c70c15997e92c7209c7056741e0e"
+    },
+    {
+      "slug": "refresh",
+      "component": "Refresh",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/refresh/index.tsx",
+      "sha256": "3efbecfdb1add7ceec4f9a6c9c5e5212f60da05094c55c2b888bceabdd3fde08"
+    },
+    {
+      "slug": "search-01",
+      "component": "Search01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/search-01/index.tsx",
+      "sha256": "350929fe55a9b24eca433b09355e80bcc11ab28c96e091ba9a875c591ca2f7fb"
+    },
+    {
+      "slug": "sent",
+      "component": "Sent",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/sent/index.tsx",
+      "sha256": "29ef1f84b0f9c4b5b652860b3477d7245d8469060762358bbbd8e3fabfba085a"
+    },
+    {
+      "slug": "settings-02",
+      "component": "Settings02",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/settings-02/index.tsx",
+      "sha256": "9004aecdf3d805ce3fd157a2c1d842b1a16ecb59fe6659417d63b4133af118b7"
+    },
+    {
+      "slug": "shield-check",
+      "component": "ShieldCheck",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/shield-check/index.tsx",
+      "sha256": "7a7e55e0007678061559325d18c71aec7252becf2434d1e609f64da1b85bc00f"
+    },
+    {
+      "slug": "sparkles",
+      "component": "Sparkles",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/sparkles/index.tsx",
+      "sha256": "f9e95240f47ec3c1833bf953f9b18972554413a7bf818704a0c739ff4efed075"
+    },
+    {
+      "slug": "star",
+      "component": "Star",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/star/index.tsx",
+      "sha256": "7d69672674d4a86830a712365e2948269b1d27a5dffc4c3807a71179130cf404"
+    },
+    {
+      "slug": "sun-03",
+      "component": "Sun03",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/sun-03/index.tsx",
+      "sha256": "d157c96301c6885222ccabdbce9053a9fc8781026184de329ee4b5649513fc65"
+    },
+    {
+      "slug": "target-01",
+      "component": "Target01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/target-01/index.tsx",
+      "sha256": "c9faaf00bc62a116e683ccc08b9aec72043af16b5ca1d1219e96241a4f7bbaca"
+    },
+    {
+      "slug": "trash",
+      "component": "Trash",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/trash/index.tsx",
+      "sha256": "d6dc0bdb4090bc940d0808878f5747344f7fbda107e7f617c90baceb1ce35a0d"
+    },
+    {
+      "slug": "upload-01",
+      "component": "Upload01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/upload-01/index.tsx",
+      "sha256": "bcd43ecae98920d069a30ba6f80928572843098050e036659f29ff2aeca9df6e"
+    },
+    {
+      "slug": "users-round",
+      "component": "UsersRound",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/users-round/index.tsx",
+      "sha256": "10f5b46fe2d5dfb7a8304c1c0b58a6b7d6f2bb7bf166e16806f2db0674bca227"
+    },
+    {
+      "slug": "volume-high",
+      "component": "VolumeHigh",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/volume-high/index.tsx",
+      "sha256": "c0ef59a5c32d25424f2cb8614e9e20004e152c2345e8c094408b5c28eda2e408"
+    },
+    {
+      "slug": "wifi-01",
+      "component": "Wifi01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/wifi-01/index.tsx",
+      "sha256": "3cdab205e136c729bbe0cd4809bfff3dbe749dc329f41359e101736afad04de1"
+    },
+    {
+      "slug": "wifi-off-01",
+      "component": "WifiOff01",
+      "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/wifi-off-01/index.tsx",
+      "sha256": "359384a33b56f38f66476eaf30ca7058835a7f4c5ea3f0fd8ffeb47421f918ee"
+    }
+  ]
+}

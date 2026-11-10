@@ -1,5 +1,6 @@
-import type { ReactNode } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { useLayoutEffect, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
+import { AnimatedNavLink as NavLink } from './AnimatedLink';
 import { AvatarView, Button, Icon } from './ui';
 import ThemeToggle from './ThemeToggle';
 
@@ -10,6 +11,8 @@ type ShellProps = {
   connection: 'connecting' | 'online' | 'offline' | 'error';
   onEditProfile: () => void;
   onInstall?: () => void;
+  immersive?: boolean;
+  unread?: number;
 };
 
 const navigation = [
@@ -20,12 +23,15 @@ const navigation = [
   { to: '/profile', name: 'Góc của bạn', short: 'Cá nhân', icon: 'heart' },
 ];
 
-export default function Shell({ children, profileName, avatar, connection, onEditProfile, onInstall }: ShellProps) {
+export default function Shell({ children, profileName, avatar, connection, onEditProfile, onInstall, immersive=false, unread=0 }: ShellProps) {
   const location = useLocation();
+  useLayoutEffect(()=>{window.scrollTo({top:0,left:0,behavior:'instant'})},[location.pathname]);
   const active = navigation.find(item => item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to));
   const status = { online: 'Đã kết nối', connecting: 'Đang kết nối', offline: 'Đang ngoại tuyến', error: 'Chưa kết nối' }[connection];
   const date = new Intl.DateTimeFormat('vi-VN', { day: 'numeric', month: 'long' }).format(new Date());
-  return <div className="app-shell">
+  const detail=location.pathname==='/profile/edit'||location.pathname==='/little-things'||immersive;
+  const title=location.pathname==='/profile/edit'?'Sửa hồ sơ':location.pathname==='/chat'?'Chuyện dưới trăng':location.pathname==='/little-things'?'Một chút vui':active?.short||'Nơi Ánh Trăng Rơi';
+  return <div className={`app-shell app-interface${immersive?' immersive-shell':''}${detail?' detail-shell':''}`}>
     <a className="skip-link" href="#main-content">Đến nội dung chính</a>
     <aside className="shell-sidebar">
       <NavLink to="/" className="brand" aria-label="Nơi Ánh Trăng Rơi — trang chủ"><span className="brand-mark"><Icon name="moon" size={27} /></span><span>Nơi Ánh Trăng Rơi<small>MỘT KHOẢNG TRỜI RIÊNG</small></span></NavLink>
@@ -38,7 +44,7 @@ export default function Shell({ children, profileName, avatar, connection, onEdi
       </div>
     </aside>
     <div className="shell-body">
-      <header className="shell-header"><div className="shell-breadcrumb"><span className="mobile-brand"><Icon name="moon" size={21} /></span><span>{active?.name || 'Khoảnh khắc bên nhau'}</span><span className="breadcrumb-divider">/</span><span className="shell-date">{date}</span></div><div className="shell-header-actions"><ThemeToggle /><span className={`connection-status connection-${connection}`} role="status"><span className="status-dot" /><span>{status}</span></span><button type="button" className="header-avatar-button" aria-label="Mở hồ sơ của bạn" onClick={onEditProfile}><AvatarView avatar={avatar} name={profileName} size="sm" /></button></div></header>
+      <header className="shell-header"><div className="shell-breadcrumb">{detail?<NavLink className="screen-back" to={location.pathname==='/profile/edit'?'/profile':'/'} aria-label="Quay lại"><Icon name="arrowLeft" size={22}/></NavLink>:<span className="mobile-brand"><Icon name="moon" size={23} /></span>}<span className="screen-title">{title}</span><span className="breadcrumb-divider">/</span><span className="shell-date">{date}</span></div><div className="shell-header-actions"><ThemeToggle />{!detail&&<NavLink className="header-chat-link" to="/chat" aria-label={unread?`Chat chung, ${unread} tin nhắn chưa đọc`:'Chat chung'}><Icon name="chat" size={22}/>{unread>0&&<span className="header-unread">{unread>99?'99+':unread}</span>}</NavLink>}<span className={`connection-status connection-${connection}`} role="status"><span className="status-dot" /><span>{status}</span></span><button type="button" className="header-avatar-button" aria-label="Mở hồ sơ của bạn" onClick={onEditProfile}><AvatarView avatar={avatar} name={profileName} size="sm" /></button></div></header>
       <main id="main-content" className="main-content" tabIndex={-1}>{children}</main>
       <footer className="shell-footer"><span>Nơi Ánh Trăng Rơi</span><span>Mỗi khoảnh khắc, một chút dịu dàng.</span><Icon name="moon" size={14} /></footer>
     </div>

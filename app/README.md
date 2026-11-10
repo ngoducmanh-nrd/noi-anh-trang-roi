@@ -18,7 +18,7 @@ Mở http://127.0.0.1:5173 . Bản chạy bình thường dùng Firebase riêng 
 ## Đã chuyển sang React
 
 - Khung ứng dụng với 5 mục chính, URL riêng, nút Back/Forward của trình duyệt.
-- Tạo/sửa hồ sơ, ảnh đại diện emoji/link/tải lên.
+- Hồ sơ dạng thẻ cá nhân, màn sửa riêng `/profile/edit`, 16 avatar anime/link/tải lên; vẫn đọc avatar emoji cũ.
 - Phòng có mật khẩu, tin nhắn hai chiều, sticker tự tạo/lưu lại và chat chung.
 - Tìm đôi, hiện diện, lời mời đến/đi, đồng ý/từ chối/thu hồi và phòng ghép đôi.
 - Thật hay Thách: rút bài, hỏi/đáp, đổi lượt không giới hạn, yêu cầu kết thúc có xác nhận.
@@ -26,6 +26,9 @@ Mở http://127.0.0.1:5173 . Bản chạy bình thường dùng Firebase riêng 
 - Ngày kỷ niệm, ghi chú, câu hỏi, bói vui; liên kết game/liên hệ/QR theo cấu hình.
 - Nhạc nền, hiệu ứng chung, thông báo mất mạng, lỗi và cập nhật phiên bản.
 - PWA có manifest, icon, service worker, bộ khung và kỷ niệm mở lại khi ngoại tuyến.
+- Trang chủ gọn với hai lối vào Phòng đôi/Tìm người; chat chung là màn riêng `/chat`.
+  Mobile có nút quay lại ở màn chi tiết và ẩn tab dưới khi đang trò chuyện.
+  Xem `DESIGN.md` cho hướng thiết kế từ ảnh tham khảo và skill UI/UX Pro Max.
 
 Trò chuyện/ghép đôi/game đồng bộ vẫn cần mạng. Đây là PWA, không phải ứng dụng native
 đã phát hành lên App Store/Google Play.
@@ -90,6 +93,21 @@ Server ở cổng 4173 chỉ phục vụ bài kiểm tra production/PWA với c�
 Không dùng server/script test này làm website thật.
 
 Ảnh kiểm tra ở `artifacts/`. Kiểm thử Firebase Rules ở thư mục cha vẫn chạy bằng `npm test`.
+
+## Icon chuyển động
+
+Giao diện dùng 35 component Hugeicons từ Animate UI, cùng `@animate-ui/react` và `motion`.
+Icon chuyển động khi rê chuột/chạm nút hoặc liên kết, tôn trọng `prefers-reduced-motion`.
+Không tải cả danh mục icon; hình trăng trang trí và avatar vẫn giữ riêng.
+
+Nguồn được ghim tại commit `22a9236ae107328f8564edb7e3299375da3247af`.
+Mã, thông tin nguồn và giấy phép MIT + Commons Clause nằm trong `src/components/animate-ui/`.
+Giữ thông báo giấy phép khi phân phối; không bán lại các component thư viện riêng lẻ.
+Muốn đồng bộ lại đúng bản: `node scripts/sync-animate-icons.mjs 22a9236ae107328f8564edb7e3299375da3247af`.
+Việc lấy phiên bản mới cần rà lại diff và chạy build cùng kiểm tra icon.
+
+Kiểm tra riêng icon, sau khi mở dev server: `npm run test:e2e -- tests/icons.spec.ts`.
+Bài kiểm tra này dùng cấu hình giả lập tại trình duyệt, chặn kết nối Firebase thật và không cần emulator.
 
 ## Những việc còn tách riêng
 

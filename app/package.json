@@ -12,7 +12,9 @@
     "test:games": "node --experimental-strip-types --test src/features/games/model.test.ts"
   },
   "dependencies": {
+    "@animate-ui/react": "^2.4.3",
     "firebase": "^13.2.0",
+    "motion": "^14.12.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router-dom": "^7.18.5"
