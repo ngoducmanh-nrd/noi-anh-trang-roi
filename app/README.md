@@ -91,12 +91,16 @@ Trước khi đổi domain cần chủ động sao lưu kỷ niệm/hồ sơ và
 ### Cấp quyền nhận và trả lời cho chủ website
 
 1. Publish bản `../database.rules.json` mới, rồi phát hành frontend mới. Không mở quyền toàn database.
-2. Trên **website thật, đúng trình duyệt anh sẽ dùng quản lý**, mở `/support/inbox`.
+2. Trên **website thật, đúng trình duyệt anh sẽ dùng quản lý**, mở trực tiếp `/support/inbox`.
+   Nút hộp thư không hiện với người chưa được cấp quyền.
    Mở **Thiết lập dành cho chủ website** rồi bấm **Sao chép mã thiết bị**.
 3. Trong Firebase Console → Realtime Database → Data, thêm một con tại
    `supportAdmins/<mã thiết bị vừa sao chép>` với giá trị **boolean `true`**, không phải chuỗi `"true"`.
    Chỉ thêm đúng mục đó, không thay toàn bộ dữ liệu. Không dùng UID của emulator hoặc localhost.
-4. Hộp thư sẽ mở tự động khi quyền được nhận; sau đó trang hỗ trợ có nút **Hộp thư hỗ trợ**.
+4. Hộp thư sẽ mở tự động khi quyền được nhận. Chỉ trình duyệt được Firebase xác nhận quản trị
+   mới thấy nút **Mở hộp thư quản trị** trên trang hỗ trợ; người dùng thường không thấy nút.
+   Nhập trực tiếp URL cũng không bỏ qua kiểm tra quyền. Trang thiết lập hiển thị mã hiện tại và
+   đường dẫn đầy đủ `supportAdmins/<uid>` để đối chiếu nếu chưa mở được hộp thư.
    Muốn thu hồi, xóa mục của UID đó trong Console. Muốn dùng thiết bị khác, cấp riêng UID của thiết bị đó.
 
 `supportAdmins` không cho bất kỳ client nào tự ghi, kể cả client quản trị; chỉ người có quyền quản lý

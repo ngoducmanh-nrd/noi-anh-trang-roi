@@ -139,3 +139,54 @@ test('support routes and utility menus fit both themes and keep five mobile tabs
     expect(errors).toEqual([]);
   } finally { await Promise.all([ca.close(), cb.close()]); }
 });
+
+test('empty support chat never clips its composer on short or zoom-equivalent screens', async ({ browser }) => {
+  const context = await browser.newContext({ reducedMotion: 'reduce' });
+  try {
+    const { page } = await prepare(context, 'Kiểm tra khung chat');
+    await expect(page.getByRole('heading', { name: 'Có điều gì bạn muốn chia sẻ?', exact: true })).toBeVisible();
+    for (const viewport of [{ width: 1366, height: 768 }, { width: 1280, height: 720 }, { width: 1100, height: 650 }, { width: 1024, height: 600 }, { width: 844, height: 390 }, { width: 768, height: 640 }, { width: 390, height: 640 }, { width: 360, height: 600 }]) {
+      await page.setViewportSize(viewport);
+      const button = page.getByRole('button', { name: 'Gửi hỗ trợ', exact: true });
+      await expect.poll(() => page.evaluate(() => [innerWidth, innerHeight])).toEqual([viewport.width, viewport.height]);
+      const bounds = await page.evaluate(() => {
+        const button = document.querySelector<HTMLElement>('.support-send-row button')!.getBoundingClientRect();
+        const card = document.querySelector<HTMLElement>('.support-conversation')!.getBoundingClientRect();
+        return { buttonBottom: button.bottom, cardBottom: card.bottom };
+      });
+      expect(bounds.buttonBottom, `${viewport.width}×${viewport.height} composer must fit card`).toBeLessThanOrEqual(bounds.cardBottom - 1);
+      if (viewport.width === 1280) await page.screenshot({ path: 'artifacts/support-short-after.png', fullPage: true });
+      expect(await log(page).evaluate(el => el.scrollTop), 'an empty feed must not scroll its introduction off the top').toBe(0);
+      await button.scrollIntoViewIfNeeded();
+
+      await expect(button, `${viewport.width}×${viewport.height} button visible after scrolling`).toBeInViewport({ ratio: 1 });
+      expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    }
+  } finally { await context.close(); }
+});
+
+test('admin inbox entry is hidden from users and follows granted or revoked admin rights', async ({ browser, request }) => {
+  const context = await browser.newContext();
+  try {
+    const { page, uid } = await prepare(context, 'Chưa có quyền hộp thư');
+    const entry = page.getByRole('link', { name: /hộp thư quản trị/i });
+    await expect(entry).toHaveCount(0);
+    await page.goto('/support/inbox');
+    await expect(page.getByRole('heading', { name: 'Hộp thư này dành cho người quản trị', exact: true })).toBeVisible();
+    await page.getByText('Thiết lập dành cho chủ website', { exact: true }).click();
+    await expect(page.locator('.support-setup code')).toHaveText(uid);
+    await expect(page.locator('.support-setup')).toContainText('supportAdmins/' + uid);
+    await expect(page.locator('.support-thread')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Gửi phản hồi', exact: true })).toHaveCount(0);
+    await page.goto('/support');
+    await grant(request, uid, true);
+    await expect(entry).toBeVisible();
+    await entry.click();
+    await expect(page).toHaveURL(/\/support\/inbox$/);
+    await expect(page.locator('.support-thread-list')).toBeVisible();
+    await grant(request, uid, false);
+    await expect(page.getByRole('heading', { name: 'Hộp thư này dành cho người quản trị', exact: true })).toBeVisible();
+    await page.goto('/support');
+    await expect(entry).toHaveCount(0);
+  } finally { await context.close(); }
+});

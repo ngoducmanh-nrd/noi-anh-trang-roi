@@ -401,3 +401,39 @@
 - Rà cuối safe-area: support chạy lại 2/2 pass (47,1s). So sánh JSON Rules với HEAD xác nhận
   mọi nhánh cũ giữ nguyên, chỉ thêm supportAdmins/supportThreads/supportMessages; diff/check sạch
   với CRLF được nhận diện. Không đưa CLAUDE.md chưa theo dõi vào phạm vi thay đổi.
+
+## Sửa cắt nút gửi và lối vào hộp thư hỗ trợ — 2026-11-11
+
+- Tái hiện từ ảnh chủ dự án: ở 1280×720, đáy nút gửi vượt đáy khung ~43px. Vùng feed có
+  min-height 160px trong khi header/composer không co; card overflow:hidden cắt mất thao tác.
+- `Support.css`: feed được co đúng, card có chiều cao tối thiểu đủ dùng và cuộn dự phòng thay vì
+  cắt nội dung; nút có scroll-margin để focus/scroll không sát mép viewport. Empty-state bỏ ràng buộc
+  cao của thành phần dùng chung; màn thấp chỉ bỏ icon trang trí, giữ hướng dẫn và nút đầy đủ.
+  `Support.tsx` không tự cuộn vùng chat đang trống xuống đáy nữa.
+- Lối vào Hộp thư quản trị luôn hiện trên trang hỗ trợ, không bị ẩn vì quyền chưa nhận/đọc lỗi.
+  Có lỗi kiểm tra quyền thì hiển thị rõ, không che đi. Trang inbox vẫn giữ guard và Rules như cũ;
+  người chưa có quyền chỉ thấy hướng dẫn, mã UID hiện tại và đường dẫn supportAdmins/<uid> cần
+  Boolean true. Không hard-code UID chủ dự án và không tự cấp quyền.
+- Thêm 2 regression test vào support.spec.ts: card không cắt nút, empty-feed scrollTop=0,
+  cuộn/focus được đến toàn bộ nút; entry inbox trước khi cấp quyền vẫn không mở dữ liệu/admin reply.
+  Khổ ngắn: 1366×768, 1280×720, 1100×650, 1024×600, 844×390, 768×640, 390×640, 360×600.
+  Kiểm tra viewport tương đương zoom, chưa thao tác zoom trình duyệt thật. Đo rect trong cùng lượt
+  evaluate sau khi viewport cập nhật để tránh trộn tọa độ của hai frame resize.
+- Playwright support: **4/4 pass (40,9s)**, bao gồm chat hai chiều/quyền riêng tư, hai theme và
+  matrix 360/390/768/1440px có từ trước. Màn quá thấp cho cuộn trang thay vì cắt composer.
+  Đã xem ảnh sau `artifacts/support-short-after.png`; ảnh trước do chủ dự án cung cấp.
+- Check/build pass; build vẫn có cảnh báo chunk chính >500kB như trước. Diff xác nhận Rules,
+  Firebase service/config, auth/state, game/chat/phòng và dependency không đổi. Không cần Publish
+  Rules lại cho riêng hotfix này. Chưa xác minh giá trị quyền trên Firebase thật, chưa thử điện thoại
+  vật lý/bàn phím ảo. Chưa commit/push/deploy hoặc ghi dữ liệu production.
+
+## Chốt ẩn nút hộp thư với người dùng thường — 2026-11-11
+
+- Theo yêu cầu tiếp theo của chủ dự án, bỏ lối vào công khai vừa thêm: nút Mở hộp thư quản trị
+  chỉ render khi Firebase xác nhận admin === true. Khi chưa có quyền, đang kiểm tra hoặc bị thu hồi
+  thì không hiện nút. Truy cập URL trực tiếp vẫn đi qua guard và Rules, không thay đổi quyền backend.
+- Giữ toàn bộ sửa layout màn thấp/khung chat ở đợt trên; cập nhật README theo đường vào riêng
+  `/support/inbox` cho thiết lập trước khi cấp quyền. Không hard-code UID và không ghi Firebase thật.
+- Playwright support 4/4 pass (41,6s): bao gồm ẩn trước cấp quyền, hiện sau cấp, vào được inbox,
+  mất quyền thì bị chặn và ẩn nút lại; chat riêng/hồi quy layout 2 theme và màn thấp vẫn qua.
+  Check/build/diff-check pass; cảnh báo chunk >500kB có sẵn vẫn còn. Không đổi Rules/dependency.

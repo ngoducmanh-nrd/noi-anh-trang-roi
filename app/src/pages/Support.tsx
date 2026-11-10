@@ -44,7 +44,7 @@ function Conversation({ userUid, admin = false, name = '', initialCategory = 'he
     return subscribeSupportMessages(userUid, values => { setMessages(values); setLoading(false); }, message => { setError(message); setLoading(false); });
   }, [ready, userUid]);
   useEffect(() => {
-    if (follow.current && feed.current) feed.current.scrollTop = feed.current.scrollHeight;
+    if (messages.length && follow.current && feed.current) feed.current.scrollTop = feed.current.scrollHeight;
   }, [messages]);
 
   async function send(event: FormEvent) {
@@ -85,9 +85,10 @@ function Conversation({ userUid, admin = false, name = '', initialCategory = 'he
 
 export default function Support() {
   const { uid } = useApp();
-  const { admin } = useSupportRole();
+  const { admin, error: roleError } = useSupportRole();
   return <div className="support-page">
-    <PageHeading eyebrow="CÙNG LÀM KHOẢNG TRỜI NÀY TỐT HƠN" title="Hỗ trợ & góp ý" description="Một cuộc trò chuyện riêng để mình lắng nghe bạn." action={admin ? <Link className="button button-secondary" to="/support/inbox"><Icon name="users" size={18} />Hộp thư hỗ trợ</Link> : undefined} />
+    <PageHeading eyebrow="CÙNG LÀM KHOẢNG TRỜI NÀY TỐT HƠN" title="Hỗ trợ & góp ý" description="Một cuộc trò chuyện riêng để mình lắng nghe bạn." action={admin === true ? <Link className="button button-secondary" to="/support/inbox"><Icon name="users" size={18} />Mở hộp thư quản trị</Link> : undefined} />
+    {roleError && <p className="error-text" role="alert">Chưa kiểm tra được quyền mở hộp thư quản trị. {roleError}</p>}
     {uid ? <Conversation key={uid} userUid={uid} /> : <section className="surface"><p className="hint" role="status">Đang kết nối để mở cuộc trò chuyện riêng của bạn…</p></section>}
     <p className="support-footnote"><Icon name="shield" size={15} />Chỉ bạn và người quản trị đọc được cuộc trò chuyện này. Giữ dữ liệu trình duyệt để có thể quay lại xem phản hồi.</p>
   </div>;
@@ -126,9 +127,10 @@ export function SupportInbox() {
     <section className="surface support-access">
       <Icon name="shield" size={28} /><h2>{!ready || admin === null ? 'Đang kiểm tra quyền truy cập…' : 'Hộp thư này dành cho người quản trị'}</h2>
       <p>Cuộc trò chuyện của mọi người được giữ riêng tư. Bạn vẫn có thể gửi yêu cầu của mình ở trang hỗ trợ.</p>
+      {admin === false && !roleError && <p>Trình duyệt này chưa được cấp quyền quản trị. Nếu bạn đã thêm quyền trong Firebase, hãy đối chiếu mã hiện tại và đường dẫn trong phần thiết lập bên dưới.</p>}
       {(roleError || !ready) && <p className="error-text" role="alert">{roleError || 'Kết nối mạng để kiểm tra quyền truy cập.'}</p>}
       <Link className="button button-secondary" to="/support">Về trang hỗ trợ<Icon name="arrowRight" size={17} /></Link>
-      {uid && <details className="support-setup"><summary>Thiết lập dành cho chủ website</summary><p>Mã thiết bị này dùng để cấp quyền nhận và trả lời hỗ trợ. Việc cấp quyền cần thực hiện trong Firebase Console của chủ dự án; trang web không thể tự cấp quyền.</p><code>{uid}</code><Button variant="secondary" onClick={() => void copyDevice()}>Sao chép mã thiết bị<Icon name="copy" size={16} /></Button></details>}
+      {uid && <details className="support-setup"><summary>Thiết lập dành cho chủ website</summary><p>Mã thiết bị này dùng để cấp quyền nhận và trả lời hỗ trợ. Việc cấp quyền cần thực hiện trong Firebase Console của chủ dự án; trang web không thể tự cấp quyền.</p><code>{uid}</code><p>Đặt đường dẫn sau thành giá trị <strong>Boolean true</strong>, không thêm mã thiết bị trực tiếp ở gốc dữ liệu:<span className="support-permission-path">supportAdmins/{uid}</span></p><Button variant="secondary" onClick={() => void copyDevice()}>Sao chép mã thiết bị<Icon name="copy" size={16} /></Button></details>}
     </section>
   </div>;
 
