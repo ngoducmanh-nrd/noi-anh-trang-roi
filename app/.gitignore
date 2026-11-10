@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tsbuildinfo
+.vercel/
+*.log
+.env*
+!.env.example
+test-results*/
+playwright-report/
+production-audit.json

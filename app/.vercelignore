@@ -1,0 +1,11 @@
+node_modules/
+artifacts/
+tests/
+test-results*/
+playwright-report/
+scripts/serve-test-build.mjs
+scripts/generate-icons.mjs
+AGENTS.md
+VALIDATION.md
+README.md
+*.log

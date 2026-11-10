@@ -1,0 +1,10 @@
+.moon-system{position:absolute;inset:0;isolation:isolate;pointer-events:none;animation:moon-system-float 9s ease-in-out infinite}
+.moon-system>.moon-orbit{z-index:1}
+.moon-system>.orbit-one{height:104px;border-color:#9c90ad}
+.moon-system>.orbit-back{clip-path:inset(50% -12px -12px -12px)}
+.moon-system>.hero-moon{z-index:2;animation:none}
+/* Clip in the ellipse's own coordinates, before its existing tilt is applied.
+   Only the upper arc crosses the moon; the full back copy stays underneath. */
+.moon-system>.orbit-front{z-index:3;clip-path:inset(-12px -12px 50% -12px)}
+@keyframes moon-system-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+@media(prefers-reduced-motion:reduce){.moon-system{animation:none}}

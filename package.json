@@ -1,0 +1,17 @@
+{
+  "name": "noi-anh-trang-roi",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "firebase emulators:exec --only database --project demo-inlove-owned \"node --test tests/database.test.mjs\"",
+    "check": "node scripts/check.mjs"
+  },
+  "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
+    "firebase": "^13.2.0",
+    "firebase-tools": "^15.35.0"
+  },
+  "dependencies": {
+    "@animate-ui/react": "^2.2.1"
+  }
+}
