@@ -226,3 +226,29 @@
   ảnh kiểm tra ở `artifacts/avatars-{night,day}-{390,1440}.png`.
 - Test dùng cấu hình trình duyệt riêng, chặn Firebase thật; không có page error.
   Chưa kiểm thử lại chat/ghép đôi hai người với emulator. Không push/deploy.
+
+## Chat và thao tác sticker — 2026-11-11
+
+- Sửa nền bong bóng tin nhắn, chiều cao vùng chat và kích thước điều khiển sticker trong
+  `src/app.css`, `src/styles.css`, `src/app-interface.css`; cuộn nằm trong vùng chat.
+- `src/features/chat/ChatPanel.tsx`: ảnh tải lên được vẽ theo đúng tỷ lệ, căn giữa canvas
+  vuông với phần thừa trong suốt. Sticker đã lưu bị méo trước đây cần tạo lại từ ảnh gốc.
+- `src/features/chat/StickerPanel.tsx`: mở/đóng bằng Motion và token Animate UI; có reduced motion,
+  reflow khi xóa, trả focus khi đóng. Nhấn giữ 450ms mới hiện thanh Xóa; thả tay không gửi/xóa.
+  Di chuyển quá 10px hủy giữ; chạm sticker khác để hủy không gửi nhầm. Có chuột phải,
+  Delete/Backspace để mở, Escape để hủy và trả focus khi thao tác bằng bàn phím.
+- Nút Xóa dùng `trash-2` chính thức của Animate UI Lucide, cùng commit ghim với Hugeicons;
+  giữ giấy phép, thêm vào script đồng bộ/manifest/registry. Không thêm dependency hoặc CDN.
+- `npm run check` tại gốc repo: pass (TypeScript, public config và JSON rules).
+- Playwright `tests/icons.spec.ts tests/app-interface.spec.ts -g "icon|real routes"`: 4/4 pass.
+  Các bài dùng cấu hình mock và chặn Firebase thật.
+- Kiểm tra trình duyệt tạm thời đã chạy rồi gỡ: tỷ lệ ảnh 100×200 trong canvas 192×192
+  giữ đúng, hai bên trong suốt; animation mở/đóng, bật tắt nhanh, reflow và giảm chuyển động: pass.
+  Kiểm tra nhấn giữ, nhấn nhanh, di chuyển để hủy, bấm ngoài, chuột phải, xóa từng sticker,
+  icon Lucide, focus bàn phím và Escape: 1/1 pass; nút Xóa cao ít nhất 44px.
+- Layout chat đã đo ở 390/1440px, không tràn ngang; thao tác nhấn giữ đo ở viewport 390px
+  bằng chuột Playwright, chưa thử cảm ứng/điện thoại thật. Chưa xác nhận lại đầy đủ 360/768px.
+  Lượt matrix app-interface đầy đủ bị timeout 120s; không coi là pass.
+- Đối chiếu Git: rules, cấu hình Firebase/dependency, service/state, game và test hiện có
+  không đổi so với HEAD. `git diff --check` với CRLF được nhận diện: pass.
+  Không ghi Firebase thật, không commit/push/deploy. Không chạy lại emulator hai người hoặc build production.

@@ -1,5 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, ReactNode, Ref } from 'react';
 import { AnimateIcon } from '@animate-ui/react/icons';
 import { Icon } from './Icon';
 
@@ -16,7 +16,7 @@ export function AvatarView({ avatar, name = '', size = 'md' }: { avatar?: Avatar
   </span>;
 }
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger' };
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & { variant?: 'primary' | 'secondary' | 'ghost' | 'danger'; ref?: Ref<HTMLButtonElement> };
 export function Button({ children, variant = 'primary', className = '', type = 'button', ...props }: ButtonProps) {
   return <AnimateIcon asChild animateOnHover={!props.disabled} animateOnTap={!props.disabled} completeOnStop><button type={type} className={`button button-${variant} ${className}`} {...props}>{children}</button></AnimateIcon>;
 }

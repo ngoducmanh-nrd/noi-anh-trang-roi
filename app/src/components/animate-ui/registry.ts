@@ -34,6 +34,7 @@ import { UsersRound } from './hugeicons/users-round';
 import { VolumeHigh } from './hugeicons/volume-high';
 import { Wifi01 } from './hugeicons/wifi-01';
 import { WifiOff01 } from './hugeicons/wifi-off-01';
+import { Trash2 as LucideTrash2 } from './lucide/trash-2';
 
 export const animatedIcons = {
   moon: Moon02,
@@ -71,4 +72,9 @@ export const animatedIcons = {
   search: Search01,
   star: Star,
   refresh: Refresh,
+};
+
+// Animate UI Lucide icons, looked up by Icon after animatedIcons.
+export const lucideIcons = {
+  trash2: LucideTrash2,
 };

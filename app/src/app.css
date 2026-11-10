@@ -79,12 +79,12 @@
 [data-theme="day"] :is(.modal,.toast,.update-notice){background:var(--surface);border-color:var(--line);color:var(--text);box-shadow:var(--shadow-pop)}
 [data-theme="day"] .modal::backdrop{background:#232a4d66}
 [data-theme="day"] .chat-feed{scrollbar-color:#929bb8 transparent}
-[data-theme="day"] :is(.message:not(.mine) .message-body,.message:not(.mine) .message-body>p){background:var(--surface-raised);color:var(--text);border-color:var(--line)}
-[data-theme="day"] :is(.message.mine .message-body,.message.mine .message-body>p){background:var(--tint-lavender);color:var(--text);border-color:#bdbbd6}
+[data-theme="day"] .message:not(.mine) .message-body>p{background:var(--surface-raised);color:var(--text);border-color:var(--line)}
+[data-theme="day"] .message.mine .message-body>p{background:var(--tint-lavender);color:var(--text);border-color:#bdbbd6}
 [data-theme="day"] .message .message-body:has(>p),[data-theme="day"] .message .message-body:has(>.sticker-message){background:none;border:0}
 [data-theme="day"] .composer{background:var(--surface-raised)}
 [data-theme="day"] .composer .input{background:transparent}
-[data-theme="day"] :is(.sticker-picker button,.sticker-item>button:first-child,.sticker-remove){background:var(--surface-raised);border-color:var(--line);color:var(--text)}
+[data-theme="day"] :is(.sticker-item>button:first-child,.sticker-remove){background:var(--surface-raised);border-color:var(--line);color:var(--text)}
 [data-theme="day"] .global-chat-fab{background:var(--lavender);color:var(--on-accent);border-color:var(--lavender);box-shadow:0 8px 24px #46509c26}
 [data-theme="day"] .global-chat-fab>.chat-unread{border-color:var(--surface);background:var(--tint-gold);color:var(--gold)}
 [data-theme="day"] :is(.game-card:hover,.game-score>div,.tab-row,.xo-board-wrap){background:var(--surface-raised);border-color:var(--line)}

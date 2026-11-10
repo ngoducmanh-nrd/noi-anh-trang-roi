@@ -99,6 +99,7 @@ Không dùng server/script test này làm website thật.
 Giao diện dùng 35 component Hugeicons từ Animate UI, cùng `@animate-ui/react` và `motion`.
 Icon chuyển động khi rê chuột/chạm nút hoặc liên kết, tôn trọng `prefers-reduced-motion`.
 Không tải cả danh mục icon; hình trăng trang trí và avatar vẫn giữ riêng.
+Ngoài ra có 1 icon Lucide của Animate UI (`trash-2`, nút xóa sticker khi nhấn giữ) trong `src/components/animate-ui/lucide/`, cùng commit ghim và cùng giấy phép.
 
 Nguồn được ghim tại commit `22a9236ae107328f8564edb7e3299375da3247af`.
 Mã, thông tin nguồn và giấy phép MIT + Commons Clause nằm trong `src/components/animate-ui/`.

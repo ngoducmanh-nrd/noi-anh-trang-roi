@@ -76,9 +76,26 @@
 .chat-screen{display:flex;flex-direction:column;min-height:180px;flex:1;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--surface)}
 .chat-screen-caption{flex:none;font-size:13px;line-height:1.5;margin:0;padding:14px 20px;border-bottom:1px solid var(--line);color:var(--muted)}
 .chat-screen .chat-panel{flex:1;min-height:0;overflow:hidden}
-.chat-screen .chat-feed{height:auto;flex:1;min-height:100px}
+.chat-screen .chat-feed{height:auto;max-height:none;flex:1;min-height:100px}
+.message-body>p{width:fit-content;max-width:100%}
+.message.mine .message-body>p,.message.mine .message-body>.sticker-message{margin-left:auto}
+.message.mine .message-body>.sticker-message{display:block}
+.sticker-grid{padding:6px;margin:10px -6px}
+.sticker-send{touch-action:manipulation;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;transition:border-color .2s}
+.sticker-send img{pointer-events:none;-webkit-user-drag:none}
+.sticker-item.is-armed>.sticker-send{border-color:var(--danger)}
+.sticker-delete-wrap{position:absolute;left:4px;right:4px;bottom:4px;z-index:2}
+.sticker-delete{width:100%;min-height:44px;padding:6px 8px;gap:6px;font-size:14px}
+.sticker-grid:empty{display:none}
+.sticker-panel{flex-shrink:0}
+.composer .icon-button{transition:background-color .2s,color .2s,transform .18s}
+.composer .icon-button.is-active{background:var(--app-tint);color:var(--lavender-bright)}
+.sticker-picker .surface-header{margin-bottom:12px}
+.sticker-picker .surface-header .button{min-width:44px;padding:10px}
+.sticker-picker .actions .button{font-size:14px}
 .chat-screen .composer{flex:none;background:var(--surface);padding-bottom:calc(12px + env(safe-area-inset-bottom))}
-.chat-screen .sticker-picker{overflow:auto;max-height:50%;flex-shrink:0}
+.chat-screen .sticker-panel{display:flex;flex-direction:column;max-height:50%;flex-shrink:0}
+.chat-screen .sticker-picker{overflow:auto;min-height:0;flex:1}
 .chat-screen .composer .input{font-size:16px}
 .chat-screen .message-meta{font-size:12px}.chat-screen .message-meta time{font-size:12px}
 .chat-screen .sticker-remove{width:32px;height:32px}

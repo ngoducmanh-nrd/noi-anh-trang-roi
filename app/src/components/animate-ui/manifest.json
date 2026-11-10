@@ -250,5 +250,18 @@
       "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/hugeicons/wifi-off-01/index.tsx",
       "sha256": "359384a33b56f38f66476eaf30ca7058835a7f4c5ea3f0fd8ffeb47421f918ee"
     }
-  ]
+  ],
+  "lucide": {
+    "mapping": {
+      "trash2": "trash-2"
+    },
+    "icons": [
+      {
+        "slug": "trash-2",
+        "component": "Trash2",
+        "url": "https://raw.githubusercontent.com/imskyleen/animate-ui/22a9236ae107328f8564edb7e3299375da3247af/apps/v2/registry/icons/trash-2/index.tsx",
+        "sha256": "8f019c4119243273073a5c6c229cf42e7aed3b84ff4986af2f6ef947055ea0b5"
+      }
+    ]
+  }
 }
