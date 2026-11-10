@@ -24,6 +24,6 @@ export function AppProvider({children}:{children:ReactNode}){
   function selectRoom(value:RoomRef|null){try{localStorage.setItem(key+':room',JSON.stringify(value));setRoom(value)}catch{setToast('Không lưu được phòng trên thiết bị.')}}
   async function setLooking(value:boolean){if(!profile)throw Error('Bạn cần tạo hồ sơ trước.');await setPresence(profile,value);setLookingState(value)}
   const connection:Connection=!online?'offline':connectionError?'error':ready?'online':'connecting';
-  return <Context.Provider value={{profile,room,uid,ready,connection,connectionError,looking,setLooking,saveProfile,selectRoom,notify:setToast}}>{children}{toast&&<div className="toast" role="status">{toast}<button aria-label="Đóng thông báo" onClick={()=>setToast('')}>×</button></div>}</Context.Provider>
+  return <Context.Provider value={{profile,room,uid,ready,connection,connectionError,looking,setLooking,saveProfile,selectRoom,notify:setToast}}>{children}{toast&&<div className="toast" key={toast} role="status">{toast}</div>}</Context.Provider>
 }
 export function localKey(suffix:string){return key+suffix}

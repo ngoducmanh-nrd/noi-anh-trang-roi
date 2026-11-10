@@ -136,3 +136,23 @@
 }
 @media(max-width:375px){.dashboard-person{gap:8px}.dashboard-identity .avatar-lg{width:48px;height:48px}.dashboard-identity h1{font-size:19px}.dashboard-wallet{padding:9px}.connect-tile{padding:16px 12px}.app-settings .app-section-heading{flex-wrap:wrap}}
 @media(prefers-reduced-motion:reduce){.app-interface *{scroll-behavior:auto!important}}
+
+/* Global chat shortcut: tucked against the right edge; hover or keyboard focus slides it out with its label. */
+.app-interface .global-chat-fab{right:0;gap:12px;min-height:52px;padding:0 20px 0 12px;border-right:0;border-radius:26px 0 0 26px;box-shadow:0 6px 24px #080a1555;transform:translateX(calc(100% - 45px));transition:transform .28s cubic-bezier(.215,.61,.355,1),box-shadow .28s}
+.app-interface .global-chat-fab:is(:hover,:focus-visible,:focus-within){transform:none}
+.app-interface .global-chat-fab>span:not(.chat-unread){white-space:nowrap;font-size:13px}
+.app-interface .global-chat-fab>.chat-unread{right:auto;left:20px;top:-8px}
+
+/* Notification surfaces: compact spacing and a short, non-bouncy fade instead of margin motion. */
+.toast,.update-notice{border-radius:12px;gap:8px;font-size:13px;line-height:1.5;overflow-wrap:anywhere;animation:notification-in 200ms cubic-bezier(.215,.61,.355,1) both}
+.toast{width:max-content;max-width:min(340px,calc(100vw - 32px));padding:10px 16px;text-align:center;pointer-events:none;animation:toast-life 5s both}
+.update-notice{width:336px;max-width:calc(100% - 48px);padding:8px 10px 8px 14px;flex-wrap:nowrap;justify-content:flex-start}
+.update-notice>span{flex:1;min-width:0}
+.update-notice>.button{flex:none;min-height:44px;padding:8px 12px;font-size:13px;white-space:nowrap}
+.update-notice>.icon-button{flex:none;width:44px;min-width:44px;min-height:44px;padding:10px}
+@keyframes notification-in{from{opacity:0;transform:translate(-50%,4px)}to{opacity:1;transform:translateX(-50%)}}
+@keyframes notification-fade{from{opacity:0}to{opacity:1}}
+/* A toast lives 5s (the timer in AppContext): it eases in over 200ms, rests, then fades out over the last 800ms. */
+@keyframes toast-life{0%{opacity:0;transform:translate(-50%,4px);animation-timing-function:cubic-bezier(.215,.61,.355,1)}4%{opacity:1;transform:translateX(-50%)}84%{opacity:1;transform:translateX(-50%);animation-timing-function:cubic-bezier(.25,.1,.25,1)}100%{opacity:0;transform:translateX(-50%)}}
+@keyframes toast-life-fade{0%{opacity:0}4%{opacity:1}84%{opacity:1}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.update-notice{animation-name:notification-fade;animation-duration:200ms!important}.toast{animation-name:toast-life-fade;animation-duration:5s!important}}

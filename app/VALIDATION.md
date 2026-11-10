@@ -252,3 +252,44 @@
 - Đối chiếu Git: rules, cấu hình Firebase/dependency, service/state, game và test hiện có
   không đổi so với HEAD. `git diff --check` với CRLF được nhận diện: pass.
   Không ghi Firebase thật, không commit/push/deploy. Không chạy lại emulator hai người hoặc build production.
+
+## Thông báo gọn và dịu hơn — 2026-11-11
+
+- Chỉ sửa CSS trình bày trong `src/app-interface.css`: toast (tạo/vào phòng, sao chép và
+  các thông báo dùng chung) giới hạn rộng 360px, giảm padding; thông báo cập nhật rộng tối đa
+  336px, không còn đẩy nút đóng xuống hàng riêng trên mobile. Giữ vùng bấm tối thiểu 44×44px.
+- Thay animation thay đổi margin của toast bằng opacity + translateY 4px, 200ms;
+  dùng thời gian `transition.fade` và đường cong `ease.soft` của Animate UI, không nảy/zoom.
+  Áp dụng cùng chuyển động cho khung cập nhật; reduced motion chỉ fade, không trượt.
+- `npm run check` tại app và gốc repo: pass. `git diff --check` nhận diện CRLF: pass.
+- Playwright kiểm tra tạm thời: 1/1 pass (11,7s), sau đó gỡ file test tạm.
+  Kiểm tra hai theme × 360/390/768/1440px: popup nằm trong viewport, không tràn nội dung/ngang,
+  các nút đạt 44px; animation đúng 200ms và chỉ di chuyển 4px, reduced motion không có transform.
+  Toast thực tế được kích hoạt qua sao chép mã phòng bằng clipboard mock; nút đóng và tự ẩn
+  sau 5s vẫn hoạt động. Khung cập nhật dùng hook PWA giả lập trong browser; nút Để sau đóng được.
+- Đã xem ảnh trước/sau 390px: `artifacts/notifications-before-390.png` và
+  `artifacts/notifications-after-390.png`. Cấu hình browser riêng chặn Firebase thật;
+  không có page error. Không tạo phòng hoặc kích hoạt cập nhật trên môi trường thật.
+- Runtime React/JavaScript, Firebase/rules, dữ liệu, thời gian tự ẩn và hành vi nút không đổi;
+  diff chỉ có CSS và tài liệu xác nhận này. Chưa thử điện thoại thật, emulator hai người,
+  cập nhật service worker production hoặc build lại. Chưa commit/push/deploy đợt này.
+- Chỉnh tiếp theo ảnh chụp của chủ dự án: toast không còn nút × (`state/AppContext.tsx`, chỉ bỏ nút
+  đóng, thêm `key` để thông báo mới chạy lại hiệu ứng). Giữ nguyên hẹn giờ 5 giây; CSS cho toast hiện
+  200ms, giữ nguyên rồi mờ dần ở 0,8 giây cuối trước khi gỡ. Toast không chặn thao tác bên dưới
+  (`pointer-events:none`). Khung cập nhật vẫn giữ nút Để sau vì cần quyết định của người dùng.
+- Playwright tạm thời (đã gỡ): không có nút trong toast; độ mờ 1 trong 1–3,5 giây,
+  giảm dần 0,66→0,25→0,09→0,01 rồi biến mất ở ~5,05 giây; reduced motion cũng mờ dần và gỡ ở ~5,1 giây;
+  thông báo thứ hai chạy lại; không có page error. `npm run check`: pass. Chưa thử điện thoại thật.
+
+  ## Nút nổi "Chuyện dưới trăng" thu vào cạnh — 2026-11-11
+
+  - Chỉ sửa CSS trong `src/app-interface.css`. Nút nổi (hiện từ 760px trở lên; dưới đó đã ẩn,
+    dùng lối vào chat trên header) dính sát cạnh phải, chỉ lộ icon rộng 45px. Di chuột hoặc focus
+    bàn phím thì trượt ra kèm chữ, 0,28s bằng `transform`; rời chuột/mất focus thì thu lại.
+    Huy hiệu tin chưa đọc chuyển sang góc trên bên trái để luôn thấy khi thu vào. Link, nhãn
+    `aria-label` và đích `/chat` không đổi; click vẫn mở chat chung.
+  - Playwright tạm thời (đã gỡ) 1/1 pass: 2 theme × 1440/1000/768px, phần lộ ra 44–56px khi thu vào,
+    mở ra nằm trọn trong viewport, không tràn ngang; focus bàn phím mở, blur thu lại; click đi đến `/chat`;
+    huy hiệu (giả lập bằng phần tử thử) nằm trong phần lộ ra. Đã xem ảnh thu vào/mở ra ở theme tối.
+    `npm run check`: pass. Không dùng Firebase thật; chưa chạy `app.spec.ts` (cần emulator) và chưa
+    thử màn hình cảm ứng lớn, nơi không có hover. Chưa commit/push đợt này.
