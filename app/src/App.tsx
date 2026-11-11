@@ -6,7 +6,7 @@ import Shell from './components/Shell';
 import ThemeToggle from './components/ThemeToggle';
 import { AvatarView, Button, Icon } from './components/ui';
 import ProfileForm from './components-extra/ProfileForm';
-import Home from './pages/Home';
+const Home=lazy(()=>import('./pages/Home'));
 const Room=lazy(()=>import('./pages/Room'));
 const Discover=lazy(()=>import('./pages/Discover'));
 const Memories=lazy(()=>import('./pages/Memories'));
@@ -19,7 +19,7 @@ import ChatPanel from './features/chat/ChatPanel';
 import { respondInvite, subscribeHearts, setHearts, subscribeInvites, subscribeOutgoing, withdrawInvite, subscribeGlobalChat, serverNow } from './lib/firebase';
 import type { Invite } from './types';
 
-class ErrorBoundary extends Component<{children:ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return{failed:true}}componentDidCatch(error:Error,info:ErrorInfo){console.error('App render error',error,info)}render(){return this.state.failed?<main className="onboarding"><section className="surface"><h1>Mình cần tải lại một chút</h1><p>Đã có lỗi khi hiển thị. Dữ liệu đã lưu vẫn được giữ trên thiết bị.</p><button className="button button-primary" onClick={()=>location.reload()}>Tải lại ứng dụng</button></section></main>:this.props.children}}
+class ErrorBoundary extends Component<{children:ReactNode},{failed:boolean}>{state={failed:false};static getDerivedStateFromError(){return{failed:true}}componentDidCatch(error:Error,info:ErrorInfo){console.error('App render error',error,info)}render(){return this.state.failed?<main className="onboarding"><section className="surface"><h1>Mình cần tải lại một chút</h1><p>Đã có lỗi khi hiển thị. Dữ liệu đã lưu vẫn được giữ trên thiết bị.</p><button className="button button-primary" onClick={()=>location.reload()}>Tải lại trang</button></section></main>:this.props.children}}
 type InstallPrompt=Event&{prompt:()=>Promise<void>;userChoice:Promise<{outcome:'accepted'|'dismissed'}>};
 function Application(){
   const {profile,saveProfile,room,ready,uid,connection,connectionError,selectRoom,notify,setLooking}=useApp();const navigate=useNavigate();

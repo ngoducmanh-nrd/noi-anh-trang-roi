@@ -202,7 +202,7 @@ export function onConnection(callback: (value: ConnectionState) => void) {
   return () => { connectionListeners.delete(callback); };
 }
 
-export type CreateRoomOptions = { passwordless?: boolean; password?: string; listed?: boolean };
+export type CreateRoomOptions = { passwordless?: boolean; password?: string; listed?: boolean; micApproval?: boolean };
 
 async function roomPasswordHash(code: string, password: string) {
   const bytes = new TextEncoder().encode(`moonlight-room:${code}:${password}`);
@@ -221,6 +221,7 @@ export async function createRoom(profile: Profile, options?: CreateRoomOptions) 
     // Calls without options retain the legacy private-room format.
     if (options) {
       meta.listed = options.listed ?? true;
+      meta.micApproval = options.micApproval === true;
       if (options.passwordless) meta.passwordless = true;
       else meta.passwordFormat = 'sha256';
     }
@@ -323,6 +324,44 @@ export function subscribeRoomPresence(room: RoomRef, callback: (uids: string[]) 
   }, error => { failed = true; onError(humanError(error)); });
   const timer = setInterval(emit, 5_000);
   return () => { stop(); clearInterval(timer); };
+}
+
+export type MicRequest = { status: 'pending' | 'approved' | 'denied'; at: number; };
+export type AudioSignal = { offer?: RTCSessionDescriptionInit & { from: string }; answer?: RTCSessionDescriptionInit & { from: string }; candidates?: Record<string, Record<string, RTCIceCandidateInit & { from: string }>> };
+
+export function subscribeMicRequests(room: RoomRef, callback: (value: Record<string, MicRequest>) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  return onValue(ref(db, `${roomPath(room)}/micRequests`), snapshot => callback(snapshot.val() || {}), error => onError(humanError(error)));
+}
+
+export async function setMicRequest(room: RoomRef, status: MicRequest['status']) {
+  const { db, uid } = requireConnection();
+  await set(ref(db, `${roomPath(room)}/micRequests/${uid}`), { status, at: serverTimestamp() });
+}
+
+export async function setMicApproval(room: RoomRef, uid: string, status: MicRequest['status']) {
+  const { db } = requireConnection();
+  await set(ref(db, `${roomPath(room)}/micRequests/${uid}`), { status, at: serverTimestamp() });
+}
+
+export function subscribeAudioSignals(room: RoomRef, callback: (value: Record<string, AudioSignal>) => void, onError: (message: string) => void) {
+  const { db } = requireConnection();
+  return onValue(ref(db, `${roomPath(room)}/audioSignals`), snapshot => callback(snapshot.val() || {}), error => onError(humanError(error)));
+}
+
+export async function writeAudioOffer(room: RoomRef, pair: string, offer: RTCSessionDescriptionInit & { from: string }) {
+  const { db } = requireConnection();
+  await update(ref(db, `${roomPath(room)}/audioSignals/${pair}`), { offer });
+}
+
+export async function writeAudioAnswer(room: RoomRef, pair: string, answer: RTCSessionDescriptionInit & { from: string }) {
+  const { db } = requireConnection();
+  await update(ref(db, `${roomPath(room)}/audioSignals/${pair}`), { answer });
+}
+
+export async function writeAudioCandidate(room: RoomRef, pair: string, uid: string, candidate: RTCIceCandidateInit & { from: string }) {
+  const { db } = requireConnection();
+  await set(push(ref(db, `${roomPath(room)}/audioSignals/${pair}/candidates/${uid}`)), candidate);
 }
 
 export async function getRoomMeta(room: RoomRef): Promise<RoomMeta> {

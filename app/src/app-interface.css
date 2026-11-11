@@ -32,16 +32,16 @@
 .identity-status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
 .dashboard-wallet{display:flex;align-items:center;gap:8px;border-radius:24px;padding:12px 16px;background:var(--app-gold);color:var(--gold);white-space:nowrap}
 .dashboard-wallet strong{font-size:18px}.dashboard-wallet>span{font-size:12px}
-.moon-banner{position:relative;isolation:isolate;display:flex;align-items:center;min-height:180px;padding:28px 32px;border-radius:24px;overflow:hidden;background:linear-gradient(120deg,var(--app-tint),var(--surface));border:1px solid var(--line)}
-.moon-banner>div:first-child{position:relative;z-index:1;max-width:68%}
-.moon-banner .eyebrow{color:var(--gold);font-size:11px;letter-spacing:.12em}
-.moon-banner h2{font-size:28px;line-height:1.35;margin:10px 0 8px;letter-spacing:-.7px}
-.moon-banner p{font-size:14px;color:var(--muted);margin:0}
-.banner-moon{position:absolute;width:270px;height:220px;right:12px;top:50%;transform:translateY(-50%);pointer-events:none}
-.banner-moon>div{width:100%;height:220px}
-.banner-moon .hero-moon{width:128px;height:128px;left:50%;top:50%}
+.moon-banner{position:relative;isolation:isolate;display:flex;align-items:center;min-height:150px;padding:24px 30px;border-radius:22px;overflow:hidden;background:linear-gradient(120deg,var(--app-tint),var(--surface));border:1px solid var(--line)}
+.moon-banner>div:first-child{position:relative;z-index:1;max-width:58%}
+.moon-banner .eyebrow{color:var(--gold);font-size:10px;letter-spacing:.14em}
+.moon-banner h2{font-size:clamp(24px,2.4vw,34px);line-height:1.2;margin:10px 0 0;letter-spacing:-.8px;font-weight:600}
+.moon-banner .home-hero-copy p{margin:10px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
+.banner-moon{position:absolute;width:230px;height:190px;right:10px;top:50%;transform:translateY(-50%);pointer-events:none}
+.banner-moon>div{width:100%;height:190px}
+.banner-moon .hero-moon{width:120px;height:120px;left:50%;top:50%}
 .banner-moon .moon-orbit{left:50%;top:50%}
-.banner-moon .orbit-one{width:230px}.banner-moon .orbit-two{width:210px;height:180px}
+.banner-moon .orbit-one{width:200px}.banner-moon .orbit-two{width:180px;height:150px}
 .app-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
 .app-section-heading h2{font-size:18px;font-weight:600;line-height:1.5;margin:0}
 .app-section-heading>.icon{color:var(--gold)}
@@ -128,8 +128,8 @@
   .app-interface.detail-shell .mobile-nav{display:none}
   .app-interface.detail-shell .shell-body{padding-bottom:0}
   .dashboard-identity{gap:12px}.dashboard-identity h1{font-size:21px}.dashboard-wallet{gap:6px;padding:10px 12px}.dashboard-wallet>span{display:none}
-  .moon-banner{min-height:132px;padding:20px;border-radius:20px}.moon-banner h2{font-size:23px;margin-top:8px}.moon-banner p{font-size:13px;max-width:200px}.moon-banner .eyebrow{font-size:10px}
-  .banner-moon{width:180px;height:160px;right:-32px;opacity:.5}.banner-moon>div{height:160px}.banner-moon .hero-moon{width:105px;height:105px}.banner-moon .orbit-one{width:180px;height:75px}
+  .moon-banner{min-height:116px;padding:20px 18px;border-radius:18px}.moon-banner>div:first-child{max-width:72%}.moon-banner h2{font-size:22px;margin-top:8px;letter-spacing:-.5px}.moon-banner .eyebrow{font-size:9px}
+  .banner-moon{width:150px;height:130px;right:-30px;opacity:.56}.banner-moon>div{height:130px}.banner-moon .hero-moon{width:88px;height:88px}.banner-moon .orbit-one{width:140px;height:60px}
   .app-section-heading{margin-bottom:12px}.app-section-heading h2{font-size:17px}
   .connect-grid{gap:12px}.connect-tile{padding:18px 16px;border-radius:20px;gap:8px}.connect-icon{width:48px;height:48px;border-radius:16px}
   .connect-tile h3{font-size:21px}.connect-tile p{font-size:13px}.connect-action{font-size:13px;padding-top:8px}
@@ -225,3 +225,24 @@
 .caro-cell:nth-child(10n){border-right:0}.caro-cell:nth-last-child(-n+10){border-bottom:0}.caro-cell:disabled{cursor:default}.caro-cell.mark-x{color:var(--lavender-bright)}.caro-cell.mark-o{color:var(--gold)}
 @media(max-width:480px){.race-lane{grid-template-columns:62px minmax(0,1fr) 34px;font-size:11px}.race-piece{width:28px;height:28px}.caro-cell{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.race-piece{transition:none}}
+
+/* Active room dashboard: make the shared context visible before the live activity. */
+.room-summary{display:grid;gap:18px;padding:22px 24px;background:linear-gradient(135deg,color-mix(in srgb,var(--lavender-dark) 58%,var(--surface)),var(--surface) 72%)}
+.room-summary-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-bottom:15px;border-bottom:1px solid var(--line-soft)}
+.room-summary-top .eyebrow{font-size:10px;letter-spacing:.13em}
+.room-summary-main{display:grid;grid-template-columns:minmax(0,1fr) minmax(220px,1fr);align-items:center;gap:24px}
+.room-summary-code{min-width:0}.room-summary-code .hint{max-width:520px}
+.room-summary .room-code{display:flex;align-items:center;gap:8px;font:700 clamp(25px,3vw,34px)/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;letter-spacing:.12em;color:var(--text)}
+.room-summary .room-code .button{width:44px;height:44px;padding:10px;color:var(--muted);letter-spacing:normal}
+.room-summary .room-code .button:hover{color:var(--text);background:var(--app-tint)}
+.room-members{display:flex;align-items:center;justify-content:flex-end;gap:9px;min-width:0;flex-wrap:wrap}
+.room-member{display:flex;align-items:center;gap:7px;min-height:44px;padding:5px 10px 5px 5px;border:1px solid var(--line-soft);border-radius:24px;background:color-mix(in srgb,var(--surface-raised) 78%,transparent);font-size:11px;color:var(--muted)}
+.room-member .avatar{width:32px;height:32px;font-size:14px}.room-members>.badge{display:none}
+.room-password{padding-top:2px}.room-password summary{display:inline-flex;align-items:center;min-height:44px;padding:8px 0;color:var(--lavender);font-size:12px;font-weight:600;cursor:pointer}.room-password .actions{padding-top:10px}.room-password code{max-width:100%;overflow:auto;padding:8px 10px;border:1px solid var(--line);border-radius:8px;color:var(--gold);font:600 12px ui-monospace,SFMono-Regular,Consolas,monospace}
+.room-tabs{margin:0;padding:5px;background:var(--surface-raised);border-color:var(--line);box-shadow:0 6px 20px #05070d1a}.room-tabs .tab-button{min-height:48px;font-size:13px}.room-chat-layout{padding:0;overflow:hidden;border-color:var(--line)}
+@media(max-width:760px){.room-summary{padding:18px 16px;gap:14px}.room-summary-main{grid-template-columns:1fr;gap:14px}.room-members{justify-content:flex-start}.room-member{font-size:12px}.room-summary .room-code{font-size:25px}.room-tabs{margin-top:-2px}.room-chat-layout{border-radius:18px}.room-chat-layout .chat-feed{min-height:280px}}
+@media(prefers-reduced-motion:reduce){.room-summary .room-code .button{transition:none}}
+
+/* Compact in-room microphone controls. */
+.room-audio{display:grid;gap:12px;padding:14px 16px;border-color:var(--line);background:color-mix(in srgb,var(--surface-raised) 75%,var(--surface));}
+.room-audio-main{display:flex;align-items:center;gap:12px;min-width:0}.room-audio-main>div{min-width:0;flex:1}.room-audio-main strong{display:block;font-size:13px}.room-audio-main p{margin:2px 0 0;color:var(--muted);font-size:11px;line-height:1.5}.room-audio-icon{display:grid;place-items:center;width:38px;height:38px;flex:none;border-radius:12px;background:var(--surface);color:var(--muted)}.room-audio-icon.is-on{background:#19372f;color:var(--green)}.room-audio-main .button{min-height:40px;flex:none}.room-mic-requests{display:grid;gap:8px;padding-top:10px;border-top:1px solid var(--line-soft)}.room-mic-request{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:9px 0;font-size:12px}.room-mic-request .actions{gap:7px}.room-mic-request .button{min-height:36px;padding:7px 11px;font-size:11px}@media(max-width:520px){.room-audio-main{align-items:flex-start;flex-wrap:wrap}.room-audio-main>div{min-width:calc(100% - 52px)}.room-audio-main>.button{width:100%}.room-mic-request{align-items:flex-start;flex-direction:column}.room-mic-request .actions{width:100%}.room-mic-request .button{flex:1}}

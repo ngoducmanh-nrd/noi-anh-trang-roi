@@ -6,6 +6,7 @@ import { useApp, localKey } from '../state/AppContext';
 import { AvatarView, Badge, Button, EmptyState, Icon, Modal, PageHeading } from '../components/ui';
 import ChatPanel from '../features/chat/ChatPanel';
 import CoupleGames from '../features/games/CoupleGames';
+import RoomAudio from '../features/room/RoomAudio';
 
 type Tab = 'chat' | 'games';
 
@@ -27,6 +28,7 @@ export default function Room() {
   const [passwordEnabled, setPasswordEnabled] = useState(true);
   const [newPassword, setNewPassword] = useState('');
   const [listed, setListed] = useState(true);
+  const [micApproval, setMicApproval] = useState(false);
   const [openRooms, setOpenRooms] = useState<OpenRoom[]>([]);
   const [listError, setListError] = useState('');
   const [listLoading, setListLoading] = useState(false);
@@ -68,7 +70,7 @@ export default function Room() {
     if (!profile || !ready || busy) return;
     setBusy(true); setError('');
     try {
-      const result = await createRoom(profile, { passwordless: !passwordEnabled, password: passwordEnabled ? newPassword : undefined, listed });
+      const result = await createRoom(profile, { passwordless: !passwordEnabled, password: passwordEnabled ? newPassword : undefined, listed, micApproval });
       createdPassword.current = result;
       try { localStorage.setItem(localKey(':password:' + result.code), result.password); } catch { /* The current page can still show the password. */ }
       setOwnerPassword(result.password); setNewPassword('');
@@ -115,10 +117,7 @@ export default function Room() {
         <section className="surface room-create">
           <div className="room-entry-heading"><span className="connect-icon"><Icon name="moon" size={24} /></span><div><span className="eyebrow">BẮT ĐẦU MỘT LỜI HẸN</span><h2>Tạo phòng của bạn</h2></div></div>
           <form className="room-entry-form" onSubmit={event => void create(event)}>
-            <label className="room-option">
-              <span><strong>Bảo vệ bằng mật khẩu</strong><small>{passwordEnabled ? 'Chỉ người có mật khẩu mới vào được.' : 'Ai biết mã phòng đều có thể tham gia.'}</small></span>
-              <input role="switch" aria-label="Bảo vệ bằng mật khẩu" type="checkbox" checked={passwordEnabled} onChange={event => setPasswordEnabled(event.target.checked)} disabled={busy} />
-            </label>
+
             {passwordEnabled && <div className="field">
               <label className="field-label" htmlFor="new-room-password">Mật khẩu bạn đặt</label>
               <input id="new-room-password" className="input" type="password" value={newPassword} onChange={event => setNewPassword(event.target.value)} minLength={8} maxLength={64} autoComplete="new-password" aria-describedby="new-room-password-hint" placeholder="Đặt mật khẩu riêng…" disabled={busy} />
@@ -127,6 +126,10 @@ export default function Room() {
             <label className="room-option">
               <span><strong>Hiện trong danh sách phòng</strong><small>{listed ? 'Mọi người sẽ thấy mã phòng, tên và ảnh đại diện của bạn.' : 'Chỉ những người bạn gửi mã mới biết phòng.'}</small></span>
               <input role="switch" aria-label="Hiện trong danh sách phòng" type="checkbox" checked={listed} onChange={event => setListed(event.target.checked)} disabled={busy} />
+            </label>
+            <label className="room-option">
+              <span><strong>Duyệt mic trước khi nói</strong><small>{micApproval ? 'Khách cần chủ phòng chấp nhận trước khi bật mic.' : 'Mọi thành viên có thể tự bật hoặc tắt mic.'}</small></span>
+              <input role="switch" aria-label="Duyệt mic trước khi nói" type="checkbox" checked={micApproval} onChange={event => setMicApproval(event.target.checked)} disabled={busy} />
             </label>
             <Button type="submit" disabled={!ready || busy}><Icon name="plus" size={18} />{busy ? 'Đang mở cửa…' : 'Tạo phòng mới'}</Button>
           </form>
@@ -155,12 +158,15 @@ export default function Room() {
       </section>
     </> : <>
       <section className="surface room-summary">
-        <div><span className="eyebrow">{room.kind === 'selectedRooms' ? 'KẾT NỐI CỦA HAI BẠN' : 'PHÒNG RIÊNG'}</span><div className="room-code">{room.code}<Button variant="ghost" aria-label="Sao chép mã phòng" onClick={() => void copy(room.code)}><Icon name="copy" size={18} /></Button></div>{meta && room.kind === 'rooms' && <p className="hint">{passwordless ? 'Không cần mật khẩu để vào' : 'Được bảo vệ bằng mật khẩu'}{isHost && (meta.listed ? ' · Hiện khi bạn đang ở trong phòng' : ' · Không hiện trong danh sách')}</p>}</div>
-        <div className="room-members" role="group" aria-label="Người đang trong phòng">{currentMembers.map(([id, m]) => <div key={id} className="room-member"><AvatarView avatar={m.avatar} name={m.name} size="sm" /><span>{m.name}</span></div>)}<Badge>{presenceError ? 'Chưa rõ hiện diện' : present === null ? 'Đang đồng bộ…' : currentMembers.length + ' người đang trong phòng'}</Badge></div>
+        <div className="room-summary-top"><span className="eyebrow">{room.kind === 'selectedRooms' ? 'KẾT NỐI CỦA HAI BẠN' : 'PHÒNG RIÊNG'}</span><Badge tone={presenceError ? 'warning' : 'success'}>{presenceError ? 'Hiện diện chưa rõ' : present === null ? 'Đang đồng bộ' : currentMembers.length + ' đang ở đây'}</Badge></div>
+        <div className="room-summary-main"><div className="room-summary-code"><div className="room-code">{room.code}<Button variant="ghost" aria-label="Sao chép mã phòng" onClick={() => void copy(room.code)}><Icon name="copy" size={18} /></Button></div>{meta && room.kind === 'rooms' && <p className="hint">{passwordless ? 'Không cần mật khẩu để vào' : 'Được bảo vệ bằng mật khẩu'}{isHost && (meta.listed ? ' · Hiện khi bạn đang ở trong phòng' : ' · Không hiện trong danh sách')}</p>}</div>
+          <div className="room-members" role="group" aria-label="Người đang trong phòng">{currentMembers.map(([id, m]) => <div key={id} className="room-member"><AvatarView avatar={m.avatar} name={m.name} size="sm" /><span>{m.name}</span></div>)}</div>
+        </div>
         {isHost && room.kind === 'rooms' && <details className="room-password"><summary>{ownerPassword && !passwordless ? 'Xem mật khẩu & lời mời' : 'Chia sẻ lời mời'}</summary><div className="actions">{ownerPassword && !passwordless && <code>{ownerPassword}</code>}<Button variant="secondary" onClick={() => void copy(invitation)}>Chép lời mời<Icon name="copy" size={16} /></Button></div>{!ownerPassword && !passwordless && <p className="hint">Mật khẩu bạn đặt không thể xem lại nếu dữ liệu trên trình duyệt đã bị xóa.</p>}</details>}
       </section>
-      <div className="tab-row" role="tablist" aria-label="Hoạt động trong phòng"><button role="tab" aria-selected={tab === 'chat'} className={'tab-button' + (tab === 'chat' ? ' active' : '')} onClick={() => setTab('chat')}><Icon name="chat" size={18} />Trò chuyện</button><button role="tab" aria-selected={tab === 'games'} className={'tab-button' + (tab === 'games' ? ' active' : '')} onClick={() => setTab('games')}><Icon name="game" size={18} />Chơi cùng nhau</button></div>
-      {tab === 'chat' ? <div className="surface chat-layout"><ChatPanel room={room} /></div> : profile && <CoupleGames room={room} profile={profile} onError={notify} />}
+      {profile && uid && <RoomAudio room={room} uid={uid} isHost={isHost} approval={meta?.micApproval === true} members={members} present={present} onError={notify} />}
+      <div className="tab-row room-tabs" role="tablist" aria-label="Hoạt động trong phòng"><button role="tab" aria-selected={tab === 'chat'} className={'tab-button' + (tab === 'chat' ? ' active' : '')} onClick={() => setTab('chat')}><Icon name="chat" size={18} />Trò chuyện</button><button role="tab" aria-selected={tab === 'games'} className={'tab-button' + (tab === 'games' ? ' active' : '')} onClick={() => setTab('games')}><Icon name="game" size={18} />Chơi cùng nhau</button></div>
+      {tab === 'chat' ? <div className="surface chat-layout room-chat-layout"><ChatPanel room={room} /></div> : profile && <CoupleGames room={room} profile={profile} onError={notify} />}
     </>}
     {room && presenceError && <p role="alert" className="error-text">Chưa đồng bộ được người đang trong phòng. {presenceError}</p>}
     {error && !selected && <p role="alert" className="error-text">{error}</p>}
@@ -169,7 +175,8 @@ export default function Room() {
       <form className="room-entry-form" onSubmit={event => { event.preventDefault(); void enter(selected.code, selectedPassword); }}>
         <div className="field"><label className="field-label" htmlFor="listed-room-password">Mật khẩu phòng</label><input id="listed-room-password" className="input" type="password" value={selectedPassword} onChange={event => setSelectedPassword(event.target.value)} required minLength={8} maxLength={64} autoComplete="off" disabled={busy} /></div>
         {error && <p className="error-text" role="alert">{error}</p>}
-        <div className="actions"><Button variant="secondary" onClick={() => { setSelected(null); setError(''); }}>Để sau</Button><Button type="submit" disabled={!ready || busy}>{busy ? 'Đang mở cửa…' : 'Vào phòng'}</Button></div>
+        <div className="actions"><Button variant="secondary" onClick={() => { setSelected(null); setError(''); }}>Để sau</Button>
+            <Button type="submit" disabled={!ready || busy}>{busy ? 'Đang mở cửa…' : 'Vào phòng'}</Button></div>
       </form>
     </Modal>}
     {confirmLeave && <Modal title="Rời căn phòng này?" onClose={() => setConfirmLeave(false)}><p className="text-muted">Tin nhắn vẫn ở lại. Bạn có thể quay lại bằng mã{passwordless ? ' phòng.' : ' và mật khẩu của phòng.'}{isHost && meta?.listed ? ' Phòng sẽ ẩn khỏi danh sách khi bạn rời đi.' : ''}</p><div className="actions"><Button variant="secondary" onClick={() => setConfirmLeave(false)}>Ở lại</Button><Button variant="danger" onClick={() => { selectRoom(null); setOwnerPassword(''); setConfirmLeave(false); }}>Rời phòng</Button></div></Modal>}

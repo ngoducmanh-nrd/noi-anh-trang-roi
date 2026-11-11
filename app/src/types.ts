@@ -37,6 +37,7 @@ export interface RoomMeta {
   passwordless?: boolean;
   passwordFormat?: 'sha256';
   listed?: boolean;
+  micApproval?: boolean;
 }
 
 export interface Message {

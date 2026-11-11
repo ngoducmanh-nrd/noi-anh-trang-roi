@@ -1,8 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import { visualizer } from 'rollup-plugin-visualizer';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   plugins: [react(), VitePWA({
     registerType: 'prompt',
     includeAssets: ['icons/moon-icon.svg', 'icons/maskable.svg'],
@@ -30,7 +31,28 @@ export default defineConfig({
       }],
       maximumFileSizeToCacheInBytes: 2_000_000
     }
-  })],
-  build: { sourcemap: false },
+  }), ...(mode === 'analyze' ? [visualizer({
+    filename: 'dist/bundle-stats.html',
+    template: 'treemap',
+    gzipSize: true,
+    brotliSize: true,
+    open: false,
+  })] : [])],
+  build: {
+    sourcemap: false,
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return undefined;
+          if (/[\\/]node_modules[\\/](react|react-dom|scheduler|use-sync-external-store)[\\/]/.test(id)) return 'vendor-react';
+          if (/[\\/]node_modules[\\/](@firebase|firebase)[\\/]/.test(id)) return 'vendor-firebase';
+          if (/[\\/]node_modules[\\/](@animate-ui|motion|motion-dom|motion-utils)[\\/]/.test(id)) return 'vendor-ui';
+          if (/[\\/]node_modules[\\/]react-router/.test(id)) return 'vendor-router';
+          return 'vendor-other';
+        },
+      },
+    },
+  },
   server: { port: 5173, strictPort: true }
-});
+}));

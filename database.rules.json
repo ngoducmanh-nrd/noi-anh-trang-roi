@@ -24,6 +24,10 @@
           "listed": {
             ".validate": "newData.isBoolean() && !data.exists()"
           },
+          "micApproval": {
+            ".write": "auth != null && root.child('rooms').child($code).child('meta/hostUid').val() === auth.uid",
+            ".validate": "newData.isBoolean()"
+          },
           "$other": {
             ".validate": false
           }
@@ -92,6 +96,30 @@
             "$other": {
               ".validate": false
             }
+          }
+        },
+        "micRequests": {
+          ".read": "auth != null && root.child('rooms').child($code).child('members').child(auth.uid).exists()",
+          "$uid": {
+            ".write": "auth != null && root.child('rooms').child($code).child('members').child(auth.uid).exists() && root.child('rooms').child($code).child('members').child($uid).exists() && ($uid === auth.uid || root.child('rooms').child($code).child('meta/hostUid').val() === auth.uid)",
+            ".validate": "newData.hasChildren(['status','at']) && (newData.child('status').val() === 'pending' || newData.child('status').val() === 'denied' || (newData.child('status').val() === 'approved' && root.child('rooms').child($code).child('meta/hostUid').val() === auth.uid)) && newData.child('at').isNumber() && newData.child('at').val() <= now + 60000"
+          }
+        },
+        "audioSignals": {
+          ".read": "auth != null && root.child('rooms').child($code).child('members').child(auth.uid).exists()",
+          "$pair": {
+            ".write": "auth != null && root.child('rooms').child($code).child('members').child(auth.uid).exists()",
+            ".validate": "newData.hasChild('offer') || newData.hasChild('answer') || newData.hasChild('candidates')",
+            "offer": { ".validate": "newData.hasChildren(['type','sdp','from']) && newData.child('from').isString()" },
+            "answer": { ".validate": "newData.hasChildren(['type','sdp','from']) && newData.child('from').isString()" },
+            "candidates": {
+              "$uid": {
+                "$candidate": {
+                  ".validate": "newData.hasChildren(['candidate','from']) && newData.child('from').val() === $uid"
+                }
+              }
+            },
+            "$other": { ".validate": false }
           }
         },
         "$other": {

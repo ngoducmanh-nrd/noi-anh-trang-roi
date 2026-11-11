@@ -1,5 +1,21 @@
 # Xác nhận bản React/PWA — 2026-11-10
 
+## Rebuild phần phòng — 2026-11-11
+
+- Làm mới dashboard phòng đang hoạt động: mã phòng, trạng thái hiện diện và thành viên được tách thành các vùng rõ ràng hơn; giữ nguyên tạo/vào phòng, mật khẩu, lời mời, chat và game.
+- Làm rõ hai tab Trò chuyện/Chơi cùng nhau và bổ sung bố cục responsive cho mobile; không thay đổi Firebase path, schema hoặc listener.
+- `npm run check` đạt; `cd app && npm run build` đạt; `rebuild_check` báo build và test đạt.
+
+
+## Tối ưu bundle và danh sách — 2026-11-11
+
+- Thêm `rollup-plugin-visualizer` và lệnh `npm run build:analyze`; báo cáo được tạo tại `dist/bundle-stats.html` khi chủ động phân tích.
+- Rà soát báo cáo: trước khi tách, chunk chính là 997 kB; các phần lớn gồm Firebase, React/ReactDOM và motion/Animate UI.
+- Thêm `manualChunks`: React/ReactDOM, Firebase, UI/motion, React Router và vendor còn lại được tách riêng; `chunkSizeWarningLimit` là 1000 kB để cảnh báo chỉ còn dành cho chunk bất thường.
+- Rà soát import: Firebase đã dùng import module cụ thể; không có lodash/moment hoặc import cả bộ icon. Không thêm thư viện thay thế vì không có trường hợp cần thiết.
+- Sau tách, entry app còn 562.87 kB; Firebase 235.78 kB, React 210.53 kB, vendor phụ 155.79 kB, UI/motion 12.81 kB. `npm run check`, `npm run test:games` (5/5), `npm run build` và `npm run build:analyze` đều đạt, không còn cảnh báo chunk vượt ngưỡng.
+
+
 ## Đợt cá nhân hoá Home theo tham chiếu 12Vibe (2026-11-10, tối)
 
 - Tham khảo 5 screenshot app 12Vibe trong `ảnh tham khảo/`; chỉ mượn cách bố trí (dải hồ sơ đầu trang,
@@ -437,3 +453,23 @@
 - Playwright support 4/4 pass (41,6s): bao gồm ẩn trước cấp quyền, hiện sau cấp, vào được inbox,
   mất quyền thì bị chặn và ẩn nút lại; chat riêng/hồi quy layout 2 theme và màn thấp vẫn qua.
   Check/build/diff-check pass; cảnh báo chunk >500kB có sẵn vẫn còn. Không đổi Rules/dependency.
+
+## Dọn dẹp listener và giảm re-render chat — 2026-11-11
+
+- Kiểm tra các listener Realtime Database hiện có: listener theo component đều trả hàm unsubscribe;
+  các timer presence/lobby/room cũng được clear khi rời component. Chat đã giới hạn dữ liệu realtime
+  ở các mức hiện có (35 tin nhắn chat chung, 150 tin nhắn phòng, 100 tin nhắn hỗ trợ), không thay đổi
+  schema hoặc Rules để tránh làm mất lịch sử đang dùng.
+- Tách từng tin nhắn thành component `memo` và ổn định callback lưu sticker bằng `useCallback`,
+  giúp tin cũ không render lại khi thêm tin mới. Route-level lazy loading đã có sẵn trong App.
+- `npm run check`, `npm run build`, `npm run test:games` và rebuild check: đạt. Build vẫn có cảnh báo
+  chunk chính lớn hơn 500kB như trước; chưa chạy kiểm thử thiết bị thật.
+
+## Lọc người đang hiển thị — 2026-11-11
+
+- Phân tích APK người dùng cung cấp cho thấy các nhóm luồng tìm bạn, chat và party; app hiện đã có
+  các luồng tương ứng nên chỉ bổ sung ô lọc cục bộ trên trang Khám phá, theo tên hoặc lời giới thiệu.
+- Không thêm dependency, không đổi Firebase path/schema/Rules, không sao chép logo, hình ảnh hoặc nội dung
+  riêng của APK. Khi không có kết quả, hiển thị trạng thái rỗng rõ ràng; số kết nối phản ánh kết quả lọc.
+- `npm run check`, `npm run build`, `npm run test:games` và `rebuild_check`: đạt. Chưa cài/chạy APK
+  trên thiết bị thật và chưa kiểm thử tương tác nhiều người với emulator.

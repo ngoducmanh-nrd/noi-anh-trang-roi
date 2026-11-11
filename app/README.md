@@ -1,6 +1,6 @@
-# Nơi Ánh Trăng Rơi · React app
+# Nơi Ánh Trăng Rơi · website React
 
-Bản nâng cấp React + TypeScript + Vite + PWA được chủ dự án yêu cầu riêng.
+Website hiện có nằm ngay trong thư mục `app/` của repository này. Mã nguồn dùng React + TypeScript + Vite + PWA.
 Bản HTML cũ đã chuyển vào thư mục lưu trữ bên ngoài repository; xem README ở thư mục cha.
 
 ## Chạy bản mới
@@ -118,6 +118,10 @@ Kiểm tra riêng sau khi mở emulator và dev server: `npx playwright test tes
 npm run build
 npm run preview
 ```
+
+Để xem bundle nào làm ứng dụng phình to, chạy `npm run build:analyze` trong thư mục này.
+Lệnh tạo `dist/bundle-stats.html` bằng Rollup Plugin Visualizer; công cụ chỉ chạy khi được gọi,
+không làm thay đổi bản build thông thường.
 
 Vite nén mã production; không xuất source map. Không có cơ chế nào bảo đảm frontend
 không thể bị sao chép. Firebase Rules vẫn quyết định quyền dữ liệu.
