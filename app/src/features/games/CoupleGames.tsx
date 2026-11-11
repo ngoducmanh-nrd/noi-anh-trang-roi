@@ -179,7 +179,7 @@ export default function CoupleGames({ room, profile, onError }: Props) {
   const canNext = joined && players.length === 2 && !!truth?.chooser && !!truth?.responder && ['choose', 'compose', 'answer'].includes(truth.phase) && !truth.endRequest;
 
   return <section className="couple-games" aria-label="Trò chơi của hai bạn">
-    <div className="couple-games-heading"><div><span className="eyebrow">Một chút gần nhau hơn</span><h2>Chơi cùng người ấy</h2></div><Icon name="game" size={26} /></div>
+    <div className="couple-games-heading"><div><span className="eyebrow">Một chút gần nhau hơn</span><h2>Chơi cùng người ấy</h2><p className="room-game-subtitle">PWA nhiều người · tạo phòng riêng và gửi mã mời</p></div><div className="room-game-badge"><Badge tone="success">PWA · MÃ MỜI</Badge><Icon name="game" size={26} /></div></div>
     <div className="game-tabs" role="tablist" aria-label="Chọn trò chơi">
       <button id="truth-tab" role="tab" aria-controls="truth-panel" aria-selected={selected === 'truth'} onClick={() => setSelected('truth')}><Icon name="sparkles" /> Thật hay Thách</button>
       <button id="xo-tab" role="tab" aria-controls="xo-panel" aria-selected={selected === 'xo'} onClick={() => setSelected('xo')}><Icon name="game" /> Cờ XO</button>
