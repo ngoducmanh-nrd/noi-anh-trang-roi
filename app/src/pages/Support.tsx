@@ -74,7 +74,7 @@ function Conversation({ userUid, admin = false, name = '', initialCategory = 'he
     </div>
     <form className="support-compose" onSubmit={event => void send(event)}>
       {!admin && <fieldset className="support-topics"><legend className="visually-hidden">Loại nội dung</legend>{topics.map(topic => <label key={topic.value}><input className="visually-hidden" type="radio" name="support-category" value={topic.value} checked={category === topic.value} onChange={() => setCategory(topic.value)} disabled={busy} /><Icon name={topic.icon} size={16} />{topic.label}</label>)}</fieldset>}
-      <label className="visually-hidden" htmlFor="support-text">Nội dung tin nhắn</label>
+      <label className="support-input-label" htmlFor="support-text">Nội dung tin nhắn</label>
       <textarea id="support-text" className="textarea" rows={2} maxLength={1500} value={text} onChange={event => setText(event.target.value)} placeholder={admin ? 'Viết phản hồi cho người dùng…' : 'Mình đang gặp vấn đề…'} disabled={busy} aria-describedby="support-privacy" />
       {error && <p className="error-text" role="alert">{error}</p>}
       {!available && <p className="hint" role="status">Cần kết nối mạng để xem và gửi tin nhắn.</p>}

@@ -1,5 +1,23 @@
 # Xác nhận bản React/PWA — 2026-11-10
 
+## Docker dev — 2026-11-12
+
+- Thêm Compose cho Vite và Firebase Auth/Database Emulator, cấu hình Firebase demo được gắn đè trong container; file cấu hình production và Rules gốc không đổi.
+- Bật polling khi `DOCKER_DEV=1` để Vite nhận thay đổi file qua bind mount trên Docker Desktop.
+- `npm run check` ở gốc repo và `npm run build` trong `app/` đạt. Chưa chạy `docker compose up` hoặc bài kiểm tra trong container vì máy hiện không có Docker CLI.
+
+## Thu gọn giao diện theo tham khảo Linear — 2026-11-12
+
+- Gói `awesome-design-md-main.zip` có 84 tài liệu DESIGN.md, không có SKILL.md; installer trả `EXTENSION_SKILL_MANIFEST_INVALID`, chưa cài thành skill. Chỉ đọc tài liệu Linear trong archive để tham khảo, không giải nén/cài thủ công hay chạy mã trong gói.
+- Chỉ đổi `src/app-interface.css`: thu gọn sidebar/header, giảm trang trí và độ đậm bề mặt, chuẩn hóa thẻ/form/hồ sơ/chat; trang chủ desktop chia hai nhóm tính năng cạnh nhau. Giữ theme đêm/ngày, font, avatar, đường dẫn và chức năng hiện có.
+- `npm run check` tại app và thư mục cha: đạt. `npm run build`: đạt. `npx playwright test tests/icons.spec.ts --output=artifacts/compact-icon-results`: 3/3 đạt, gồm đổi theme, điều hướng cảm ứng và giảm chuyển động.
+- Chrome kiểm tra 72 tổ hợp: 9 màn hình (`/`, `/room`, `/discover`, `/memories`, `/profile`, `/profile/edit`, `/chat`, `/little-things`, `/support`) × 360/390/768/1440px × đêm/ngày. Không tràn ngang, không có pageerror hay lỗi HTTP tài nguyên localhost. Nhãn nút chat nổi chủ ý nằm ngoài màn hình khi thu gọn được kiểm tra riêng: mở đầy đủ khi focus.
+- Đã thử Trang chủ → Phòng, Hồ sơ → Sửa → Quay lại, vào Chat và Escape, vị trí composer, focus không bị thanh dưới che, tên tiếng Việt dài và màn ngang 844×390.
+- Browser dùng context riêng, cấu hình dự án kiểm tra thiếu kết nối và chặn request ngoài localhost; hồ sơ minh họa chỉ nằm trong localStorage của context đó. Cảnh báo kết nối trong ảnh là trạng thái kiểm tra, không thay cấu hình ứng dụng để chụp ảnh.
+- SHA-256 đối chiếu 149 file Git ban đầu: trước khi ghi báo cáo này, chỉ `src/app-interface.css` đổi; toàn bộ TS/TSX, cấu hình Firebase, Rules, dependency và tests giữ nguyên. Không chạm các file untracked có sẵn.
+- Ảnh trước: `../../artifacts/compact-before-desktop.png`, `compact-before-mobile.png`. Ảnh sau: `../../artifacts/compact-{night,day}-{390,1440}-{home,room,profile,chat}.png`; kết quả chi tiết `../../artifacts/compact-verification.json`.
+- Chưa chạy emulator/luồng hai người, chưa kiểm thử gửi chat hoặc tạo phòng trực tuyến; không ghi dữ liệu Firebase thật, không commit/push/deploy.
+
 ## Rebuild phần phòng — 2026-11-11
 
 - Làm mới dashboard phòng đang hoạt động: mã phòng, trạng thái hiện diện và thành viên được tách thành các vùng rõ ràng hơn; giữ nguyên tạo/vào phòng, mật khẩu, lời mời, chat và game.
@@ -473,3 +491,32 @@
   riêng của APK. Khi không có kết quả, hiển thị trạng thái rỗng rõ ràng; số kết nối phản ánh kết quả lọc.
 - `npm run check`, `npm run build`, `npm run test:games` và `rebuild_check`: đạt. Chưa cài/chạy APK
   trên thiết bị thật và chưa kiểm thử tương tác nhiều người với emulator.
+
+## Tinh chỉnh trang hỗ trợ trên Docker — 2026-11-12
+
+- Sửa `src/pages/Support.css`: giới hạn chiều rộng desktop, bố trí khung chat theo chiều cao màn hình,
+  tin nhắn không co/cắt nội dung và nằm gần vùng soạn, lựa chọn chủ đề một hàng trên điện thoại,
+  trạng thái chọn/focus rõ hơn. Inbox chuyển một cột trên tablet để vùng phản hồi không quá hẹp.
+- `src/pages/Support.tsx` chỉ đổi class của label Nội dung tin nhắn để hiển thị nhãn; không đổi handler,
+  subscription, UID, đường dẫn dữ liệu, phân quyền, quy định nhập hoặc thao tác gửi.
+- Đã chạy dev server và Firebase Emulator bằng Docker Compose riêng `natr-ui-check`; không thay
+  cấu hình Docker có sẵn. Kiểm thử chỉ ghi project `demo-inlove-owned`, chặn mọi host ngoài localhost.
+- `npm run check` trong container đạt; Docker image `natr-preview:support-polish` build thành công
+  với `npm run build`. Cấu hình Firebase trong image khớp SHA-256 với `public/app-config.js` gốc.
+- Playwright hiện có: support 4/4, icons 3/3 và bài điều hướng hồ sơ/chat đạt. Lượt chạy chung 8/9:
+  bài matrix app-interface dừng tại `/little-things` vì yêu cầu `#main-content h1`, trong khi trang
+  có heading h2. Không sửa trang/test ngoài phạm vi này và không tuyên bố toàn bộ suite đạt.
+- Script riêng `../../artifacts/verify-support-polish.cjs` kiểm tra bản trước, bản dev, bản build và
+  bản cuối ở cổng 8090: 42 tổ hợp mỗi lượt, gồm empty/conversation/history, day/night và kích thước
+  360×800, 390×844, 768×1024, 1440×900, 1280×720, 844×390, 390×640. Chờ media query và font ổn định
+  trước khi đo để tránh lấy layout cũ ngay sau resize. Bản cuối không tràn ngang/cắt nút, không page error
+  hoặc lỗi HTTP tài nguyên; các control chủ đề và gửi đạt tối thiểu 44px.
+- Kiểm tra riêng chọn chủ đề bằng phím mũi tên, chặn nội dung trắng, gửi/nhận bằng emulator, giữ bản nháp
+  khi offline. Tám nhóm chữ/nội dung kiểm tra có tương phản tối thiểu 5,21:1 trong cả hai theme.
+- Bản mới chạy tại `http://127.0.0.1:8090`; container cũ được dừng và giữ tên
+  `natr-preview-before-support` để có thể quay lại, không xóa dữ liệu trình duyệt. `/`, `/support`
+  trả 200; `/app-config.js` trả 200 với `Cache-Control: no-store`.
+- Bằng chứng: `../../artifacts/support-polish-before-*.png`, `support-polish-final-*.png`,
+  `support-polish-final.json` và baseline SHA-256 `support-polish-baseline.json` (157 file).
+  Chưa thử bàn phím ảo/điện thoại vật lý hoặc kết nối Firebase production; chưa push/publish website.
+

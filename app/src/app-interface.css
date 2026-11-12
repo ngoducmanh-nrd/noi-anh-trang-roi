@@ -1,72 +1,98 @@
-/* App screens: one header, five tabs, concise actions and predictable detail routes. */
-.app-interface{--app-tint:color-mix(in srgb,var(--lavender) 12%,var(--surface));--app-gold:color-mix(in srgb,var(--gold) 10%,var(--surface));font-size:16px}
+.app-interface{
+  --sidebar-width:232px;
+  --radius:16px;
+  --app-tint:color-mix(in srgb,var(--lavender) 6%,var(--surface));
+  --app-gold:color-mix(in srgb,var(--gold) 6%,var(--surface));
+  font-size:16px;
+}
 .app-interface .shell-footer{display:none}
-
-/* Home-only moonlight particles: decorative, pointer-safe, and hidden from assistive technology. */
-.app-home{position:relative;isolation:isolate}
-.app-home::before,.app-home::after{content:'';position:absolute;inset:-18px -28px;z-index:0;pointer-events:none;background-repeat:no-repeat;opacity:.72}
-.app-home>*{position:relative;z-index:1}
-.app-home::before{background-image:radial-gradient(circle at 8% 18%,color-mix(in srgb,var(--gold) 72%,transparent) 0 2px,transparent 3px),radial-gradient(circle at 26% 43%,color-mix(in srgb,var(--lavender-bright) 72%,transparent) 0 1.5px,transparent 3px),radial-gradient(circle at 44% 12%,color-mix(in srgb,var(--gold) 62%,transparent) 0 1px,transparent 2.5px),radial-gradient(circle at 63% 55%,color-mix(in srgb,var(--lavender-bright) 68%,transparent) 0 2px,transparent 3px),radial-gradient(circle at 82% 28%,color-mix(in srgb,var(--gold) 70%,transparent) 0 1.5px,transparent 3px),radial-gradient(circle at 94% 72%,color-mix(in srgb,var(--lavender-bright) 60%,transparent) 0 1px,transparent 2.5px);animation:moon-particles-drift 16s ease-in-out infinite}
-.app-home::after{background-image:radial-gradient(circle at 16% 78%,color-mix(in srgb,var(--lavender-bright) 58%,transparent) 0 1px,transparent 2.5px),radial-gradient(circle at 36% 65%,color-mix(in srgb,var(--gold) 60%,transparent) 0 1.5px,transparent 3px),radial-gradient(circle at 57% 84%,color-mix(in srgb,var(--lavender-bright) 60%,transparent) 0 1px,transparent 2.5px),radial-gradient(circle at 74% 8%,color-mix(in srgb,var(--gold) 65%,transparent) 0 2px,transparent 3px),radial-gradient(circle at 88% 58%,color-mix(in srgb,var(--lavender-bright) 60%,transparent) 0 1.5px,transparent 3px);animation:moon-particles-rise 19s ease-in-out 2s infinite}
-@keyframes moon-particles-drift{0%,100%{opacity:.35;transform:translate3d(0,8px,0) scale(.96)}50%{opacity:.8;transform:translate3d(10px,-12px,0) scale(1.04)}}
-@keyframes moon-particles-rise{0%,100%{opacity:.25;transform:translate3d(-6px,12px,0)}50%{opacity:.72;transform:translate3d(8px,-16px,0)}}
+.app-interface .shell-sidebar{padding:24px 16px 16px}
+.app-interface .brand{gap:8px;font-size:12px}
+.app-interface .brand small{font-size:8px;letter-spacing:.1em}
+.app-interface .sidebar-divider{margin:24px 8px}
+.app-interface .nav-label{font-size:10px;letter-spacing:.06em;padding:0 12px;margin-bottom:12px}
+.app-interface .desktop-nav{gap:4px}
+.app-interface .nav-item{min-height:44px;padding:10px 12px;font-size:13px;border-radius:10px;color:var(--muted)}
+.app-interface .nav-item:hover{background:var(--surface-hover);color:var(--text)}
+.app-interface .nav-item.active{background:var(--app-tint);color:var(--lavender-bright);box-shadow:inset 2px 0 var(--lavender)}
+.app-interface .sidebar-note{margin:0 12px 20px;font-size:12px}
+.app-interface .sidebar-note>.icon{margin-bottom:8px}
+.app-interface .sidebar-note-line{margin-top:12px}
+.app-interface .sidebar-profile strong{font-size:12px}
+.app-interface .sidebar-profile small{font-size:11px}
+.app-interface .shell-header{height:72px;padding:0 32px;border-color:var(--line-soft)}
+.app-interface .shell-header-actions{gap:16px}
+.app-interface .shell-breadcrumb{gap:12px}
+.app-interface .shell-date,.app-interface .connection-status{font-size:12px}
+.app-interface .surface{box-shadow:none;border-color:var(--line-soft);padding:24px}
+.app-interface .button-primary{box-shadow:none}
+.app-interface .page-heading h1{font-size:28px;letter-spacing:0}
+.app-interface .page-heading p{font-size:14px;margin-top:8px}
+.app-interface .page-heading .eyebrow{letter-spacing:.08em}
+.app-interface .surface-header h2,.app-interface .section-title{font-size:17px;letter-spacing:0}
+.app-interface .surface-header{margin-bottom:16px}
+.app-home{position:relative}
+.app-home>section{min-width:0}
 
 .app-interface .shell-sidebar{overflow-y:auto;scrollbar-width:thin}
 .app-interface .shell-sidebar>.desktop-nav,.app-interface .sidebar-bottom{flex-shrink:0}
 .app-interface .utility-nav-label{margin-top:24px;margin-bottom:12px}
 .app-interface .sidebar-bottom{padding-top:24px}
-.app-interface .main-content{max-width:1120px;padding-top:24px}
+.app-interface .main-content{max-width:1200px;padding:28px 32px 40px}
 .app-interface .page-stack{gap:24px}
-.app-interface .screen-title{font-size:18px;font-weight:600;color:var(--text)}
+.app-interface .screen-title{font-size:16px;font-weight:600;color:var(--text)}
 .screen-back{width:44px;height:44px;display:grid;place-items:center;color:var(--text);border-radius:50%;flex:none}
 .screen-back:hover{background:var(--app-tint)}
 .header-chat-link{display:none;position:relative;place-items:center;width:44px;height:44px;border-radius:50%;color:var(--text);flex:none}
 .header-unread{position:absolute;top:0;right:-2px;min-width:18px;height:18px;padding:0 4px;display:grid;place-items:center;border-radius:12px;font-size:11px;background:var(--lavender);color:var(--on-accent,var(--bg))}
 .app-interface .global-chat-fab{text-decoration:none}
 .app-interface .notice{font-size:13px;line-height:1.6;padding:10px 14px;margin-bottom:16px}
-.dashboard-person{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.dashboard-person{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:64px}
 .dashboard-identity{display:flex;align-items:center;gap:16px;min-width:0;color:var(--text);text-decoration:none}
 .dashboard-identity>span:last-child{min-width:0}
-.dashboard-identity h1{font-size:24px;line-height:1.35;margin:3px 0 6px;overflow-wrap:anywhere}
+.dashboard-identity h1{font-size:22px;line-height:1.4;margin:2px 0 4px;overflow-wrap:anywhere}
+.dashboard-identity .avatar-lg{width:52px;height:52px;font-size:22px}
 .dashboard-identity .text-muted{font-size:13px}
 .identity-status{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}
-.dashboard-wallet{display:flex;align-items:center;gap:8px;border-radius:24px;padding:12px 16px;background:var(--app-gold);color:var(--gold);white-space:nowrap}
+.dashboard-wallet{display:flex;align-items:center;gap:8px;border:1px solid var(--line-soft);border-radius:12px;padding:8px 12px;background:var(--surface);color:var(--gold);white-space:nowrap;flex:none;font-variant-numeric:tabular-nums}
 .dashboard-wallet strong{font-size:18px}.dashboard-wallet>span{font-size:12px}
-.moon-banner{position:relative;isolation:isolate;display:flex;align-items:center;min-height:150px;padding:24px 30px;border-radius:22px;overflow:hidden;background:linear-gradient(120deg,var(--app-tint),var(--surface));border:1px solid var(--line)}
-.moon-banner>div:first-child{position:relative;z-index:1;max-width:58%}
+.moon-banner{position:relative;isolation:isolate;display:flex;align-items:center;min-height:172px;padding:28px;border-radius:16px;overflow:hidden;background:linear-gradient(110deg,var(--app-tint),var(--surface));border:1px solid var(--line-soft)}
+.moon-banner>div:first-child{position:relative;z-index:1;max-width:calc(100% - 220px)}
 .moon-banner .eyebrow{color:var(--gold);font-size:10px;letter-spacing:.14em}
-.moon-banner h2{font-size:clamp(24px,2.4vw,34px);line-height:1.2;margin:10px 0 0;letter-spacing:-.8px;font-weight:600}
+.moon-banner h2{font-size:clamp(24px,2.3vw,32px);line-height:1.35;margin:8px 0 0;letter-spacing:0;font-weight:600;text-wrap:balance}
 .moon-banner .home-hero-copy p{margin:10px 0 0;color:var(--muted);font-size:13px;line-height:1.5}
 .banner-moon{position:absolute;width:230px;height:190px;right:10px;top:50%;transform:translateY(-50%);pointer-events:none}
 .banner-moon>div{width:100%;height:190px}
 .banner-moon .hero-moon{width:120px;height:120px;left:50%;top:50%}
 .banner-moon .moon-orbit{left:50%;top:50%}
 .banner-moon .orbit-one{width:200px}.banner-moon .orbit-two{width:180px;height:150px}
-.app-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
-.app-section-heading h2{font-size:18px;font-weight:600;line-height:1.5;margin:0}
+.app-section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.app-section-heading h2{font-size:16px;font-weight:600;line-height:1.5;margin:0}
 .app-section-heading>.icon{color:var(--gold)}
-.connect-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.connect-tile{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:10px;padding:24px;border:1px solid var(--line);border-radius:24px;background:var(--app-tint);color:var(--text);text-decoration:none;transition:background .18s,border-color .18s}
-.connect-discover{background:var(--app-gold)}
-.connect-icon{width:56px;height:56px;display:grid;place-items:center;border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--lavender-bright)}
+.connect-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.connect-tile{display:flex;flex-direction:column;align-items:flex-start;min-width:0;gap:8px;padding:20px;border:1px solid var(--line-soft);border-radius:16px;background:var(--surface);color:var(--text);text-decoration:none;transition:background .18s,border-color .18s}
+.connect-private{background:var(--app-tint)}
+.connect-icon{width:44px;height:44px;display:grid;place-items:center;border:1px solid var(--line-soft);border-radius:12px;background:var(--app-tint);color:var(--lavender-bright)}
+.connect-icon>.icon{width:24px;height:24px}
 .connect-discover .connect-icon{color:var(--gold)}
-.connect-tile h3{font-size:22px;line-height:1.4;margin:4px 0 0;letter-spacing:-.4px}
-.connect-tile p{font-size:14px;color:var(--muted);line-height:1.6;margin:0}
-.connect-action{display:flex;align-items:center;justify-content:space-between;width:100%;margin-top:auto;padding-top:12px;font-size:14px;font-weight:600;color:var(--lavender-bright)}
+.connect-tile h3{font-size:19px;line-height:1.4;margin:4px 0 0;letter-spacing:0}
+.connect-tile p{font-size:13px;color:var(--muted);line-height:1.6;margin:0}
+.connect-action{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;margin-top:auto;padding-top:12px;font-size:13px;font-weight:600;color:var(--lavender-bright)}
 .connect-tile:hover{border-color:var(--lavender)}
 .connect-tile:active,.app-menu-row:active{background:var(--surface-hover)}
-.app-menu{border:1px solid var(--line);border-radius:22px;background:var(--surface);overflow:hidden}
-.app-menu-row{width:100%;display:flex;align-items:center;gap:16px;padding:18px 20px;min-height:80px;text-align:left;color:var(--text);background:transparent;border:0;text-decoration:none;font:inherit;cursor:pointer;transition:background .18s}
+.app-menu{border:1px solid var(--line-soft);border-radius:16px;background:var(--surface);overflow:hidden}
+.app-menu-row{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;min-height:76px;text-align:left;color:var(--text);background:transparent;border:0;text-decoration:none;font:inherit;cursor:pointer;transition:background .18s}
+.app-menu-row:focus-visible{outline-offset:-3px}
 .app-menu-row+.app-menu-row{border-top:1px solid var(--line-soft)}
 .app-menu-row:hover{background:var(--app-tint)}
-.menu-icon{display:grid;place-items:center;flex:none;width:44px;height:44px;border-radius:15px;background:var(--app-tint);color:var(--lavender-bright)}
+.menu-icon{display:grid;place-items:center;flex:none;width:40px;height:40px;border-radius:12px;background:var(--app-tint);color:var(--lavender-bright)}
 .menu-icon.gold{color:var(--gold);background:var(--app-gold)}
 .app-menu-row>span:nth-child(2){flex:1;min-width:0}
-.app-menu-row strong{display:block;font-size:16px;font-weight:600;line-height:1.5}
-.app-menu-row small{display:block;color:var(--muted);font-size:13px;line-height:1.5;margin-top:3px}
+.app-menu-row strong{display:block;font-size:14px;font-weight:600;line-height:1.5}
+.app-menu-row small{display:block;color:var(--muted);font-size:12px;line-height:1.5;margin-top:3px}
 .app-menu-row>.icon:last-child{color:var(--muted);flex:none}
 .app-profile{max-width:760px;margin:0 auto}
-.profile-identity-card{position:relative;border:1px solid var(--line);border-radius:24px;padding:28px;background:linear-gradient(130deg,var(--surface),var(--app-tint))}
+.profile-identity-card{position:relative;border:1px solid var(--line-soft);border-radius:16px;padding:24px;background:var(--surface)}
 .profile-identity-card>.eyebrow{font-size:11px;color:var(--gold)}
 .profile-edit-link{position:absolute;top:16px;right:16px;width:44px;height:44px;display:grid;place-items:center;border-radius:50%;color:var(--lavender-bright)}
 .profile-edit-link:hover{background:var(--surface)}
@@ -75,7 +101,7 @@
 .profile-identity p{font-size:14px;color:var(--muted);margin:0}
 .profile-bio{font-size:15px;line-height:1.7;color:var(--muted);margin-top:20px;white-space:pre-wrap;overflow-wrap:anywhere}
 .profile-edit-action{display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--line);margin-top:24px;min-height:44px;padding-top:16px;color:var(--lavender-bright);text-decoration:none;font-size:14px;font-weight:600}
-.app-settings .setting-row{padding:18px 20px;min-height:76px}.app-settings .setting-row:last-child{border:0}
+.app-settings .setting-row{padding:14px 16px;min-height:64px}.app-settings .setting-row:last-child{border:0}
 .app-settings .setting-row>span{font-size:15px}.app-settings .hint{font-size:12px;margin:10px 4px 0}
 .app-settings .badge{font-size:11px;white-space:normal}
 .privacy-footnote{display:flex;gap:12px;align-items:flex-start;padding:0 8px;color:var(--muted)}
@@ -87,7 +113,7 @@
 .immersive-shell .shell-header{flex-shrink:0}
 .immersive-shell .main-content{display:flex;flex-direction:column;flex:1;min-height:0;overflow:auto}
 .immersive-shell .main-content>.notice{flex-shrink:0}
-.chat-screen{display:flex;flex-direction:column;min-height:180px;flex:1;border:1px solid var(--line);border-radius:24px;overflow:hidden;background:var(--surface)}
+.chat-screen{display:flex;flex-direction:column;min-height:180px;flex:1;border:1px solid var(--line-soft);border-radius:16px;overflow:hidden;background:var(--surface)}
 .chat-screen-caption{flex:none;font-size:13px;line-height:1.5;margin:0;padding:14px 20px;border-bottom:1px solid var(--line);color:var(--muted)}
 .chat-screen .chat-panel{flex:1;min-height:0;overflow:hidden}
 .chat-screen .chat-feed{height:auto;max-height:none;flex:1;min-height:100px}
@@ -113,29 +139,60 @@
 .chat-screen .composer .input{font-size:16px}
 .chat-screen .message-meta{font-size:12px}.chat-screen .message-meta time{font-size:12px}
 .chat-screen .sticker-remove{width:32px;height:32px}
+@media(min-width:1200px){
+  .app-interface .app-home{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px 24px}
+  .dashboard-person,.moon-banner{grid-column:1/-1}
+  .app-home>section:nth-child(n+3){display:flex;flex-direction:column}
+  .app-home .connect-grid,.app-home .app-menu{flex:1}
+}
+@media(min-width:761px) and (max-width:1000px){
+  .app-interface{--sidebar-width:208px}
+  .app-interface .shell-sidebar{padding:20px 12px 16px}
+  .app-interface .brand{font-size:11px;gap:4px}
+  .app-interface .nav-label{font-size:9px;letter-spacing:.03em}
+  .app-interface .main-content{padding:24px}
+  .app-interface .shell-header{padding:0 24px}
+  .app-interface .shell-date,.app-interface .breadcrumb-divider{display:none}
+  .moon-banner{padding:24px}
+  .moon-banner>div:first-child{max-width:calc(100% - 120px)}
+  .banner-moon{right:-30px;width:180px;opacity:.7}
+}
 @media(max-width:760px){
   .app-interface .shell-header{height:64px;min-height:64px;padding:0 16px;position:sticky;top:0;z-index:35;background:var(--sidebar);border-bottom:1px solid var(--line-soft)}
   .app-interface .shell-header-actions{gap:10px}.app-interface .shell-breadcrumb{gap:10px;min-width:0}
   .app-interface .header-avatar-button{display:none}.app-interface .connection-status{display:none}
   .app-interface .header-chat-link{display:grid}
-  .app-interface .screen-title{font-size:18px}.app-interface .breadcrumb-divider,.app-interface .shell-date{display:none}
-  .app-interface .main-content{padding:20px 16px 28px}
+  .app-interface .screen-title{font-size:16px}.app-interface .breadcrumb-divider,.app-interface .shell-date{display:none}
+  .app-interface .main-content{padding:20px 16px 24px}
+  .app-interface .page-stack{gap:20px}
+  .app-interface .surface{padding:20px}
+  .app-interface .page-heading h1{font-size:24px}
+  .app-interface .page-heading p{font-size:13px}
   .app-interface .shell-body{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
-  .app-interface .mobile-nav{min-height:76px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:var(--sidebar);border-top:1px solid var(--line);backdrop-filter:none}
-  .app-interface .mobile-nav-item{font-size:12px;gap:5px;min-height:56px;border-radius:16px}
+  .app-interface .mobile-nav{min-height:72px;padding:6px 8px calc(6px + env(safe-area-inset-bottom));background:var(--sidebar);border-top:1px solid var(--line-soft);backdrop-filter:none}
+  .app-interface .mobile-nav-item{font-size:11px;gap:4px;min-height:56px;border-radius:12px}
   .app-interface .mobile-nav-item.active{background:var(--app-tint);color:var(--lavender-bright)}
   .app-interface .global-chat-fab{display:none}
   .app-interface.detail-shell .mobile-nav{display:none}
   .app-interface.detail-shell .shell-body{padding-bottom:0}
-  .dashboard-identity{gap:12px}.dashboard-identity h1{font-size:21px}.dashboard-wallet{gap:6px;padding:10px 12px}.dashboard-wallet>span{display:none}
-  .moon-banner{min-height:116px;padding:20px 18px;border-radius:18px}.moon-banner>div:first-child{max-width:72%}.moon-banner h2{font-size:22px;margin-top:8px;letter-spacing:-.5px}.moon-banner .eyebrow{font-size:9px}
-  .banner-moon{width:150px;height:130px;right:-30px;opacity:.56}.banner-moon>div{height:130px}.banner-moon .hero-moon{width:88px;height:88px}.banner-moon .orbit-one{width:140px;height:60px}
-  .app-section-heading{margin-bottom:12px}.app-section-heading h2{font-size:17px}
-  .connect-grid{gap:12px}.connect-tile{padding:18px 16px;border-radius:20px;gap:8px}.connect-icon{width:48px;height:48px;border-radius:16px}
-  .connect-tile h3{font-size:21px}.connect-tile p{font-size:13px}.connect-action{font-size:13px;padding-top:8px}
-  .app-menu-row{padding:16px;gap:12px}.app-menu-row strong{font-size:15px}.app-menu-row small{font-size:12px}
+  .dashboard-identity{gap:12px}.dashboard-identity h1{font-size:20px}.dashboard-wallet{gap:6px;padding:8px 10px}.dashboard-wallet>span{display:none}
+  .moon-banner{min-height:152px;padding:20px 16px;border-radius:16px}
+  .moon-banner>div:first-child{max-width:calc(100% - 78px)}
+  .moon-banner h2{font-size:22px;margin-top:6px;letter-spacing:0}
+  .moon-banner .eyebrow{font-size:9px;letter-spacing:.08em}
+  .moon-banner .home-hero-copy p{font-size:12px;margin-top:8px}
+  .banner-moon{width:124px;height:124px;right:-24px;opacity:.7}
+  .banner-moon>div{height:124px}.banner-moon .hero-moon{width:72px;height:72px}
+  .banner-moon .orbit-one{width:112px;height:50px}
+  .app-section-heading{margin-bottom:12px}.app-section-heading h2{font-size:16px}
+  .connect-grid{gap:12px}.connect-tile{padding:16px;border-radius:16px;gap:6px}
+  .connect-icon{width:40px;height:40px;border-radius:12px}
+  .connect-tile h3{font-size:18px}.connect-tile p{font-size:12px}
+  .connect-action{font-size:12px;padding-top:10px}
+  .app-menu-row{padding:12px 14px;gap:12px;min-height:72px}
+  .app-menu-row strong{font-size:14px}.app-menu-row small{font-size:12px}
   .profile-identity-card{padding:24px}.profile-identity{gap:16px}.profile-identity h1{font-size:24px}.profile-identity .avatar-xl{width:76px;height:76px}
-  .profile-editor{padding:20px;border-radius:20px}.profile-editor>h1{font-size:20px}
+  .profile-editor{padding:20px;border-radius:16px}.profile-editor>h1{font-size:20px}
   .app-interface.immersive-shell .main-content{display:flex;flex-direction:column;height:calc(100dvh - 64px);padding:0;overflow:auto}
   .immersive-shell .main-content>.notice{margin:8px 12px;flex:none;font-size:12px;padding:8px 12px}
   .chat-screen{height:auto;min-height:240px;flex:1;border:0;border-radius:0}
@@ -149,7 +206,7 @@
   .immersive-shell .chat-layout .composer{position:sticky;bottom:0;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
 }
 @media(max-width:375px){.dashboard-person{gap:8px}.dashboard-identity .avatar-lg{width:48px;height:48px}.dashboard-identity h1{font-size:19px}.dashboard-wallet{padding:9px}.connect-tile{padding:16px 12px}.app-settings .app-section-heading{flex-wrap:wrap}}
-@media(prefers-reduced-motion:reduce){.app-interface *{scroll-behavior:auto!important}.app-home::before,.app-home::after{animation:none;opacity:.5}}
+@media(prefers-reduced-motion:reduce){.app-interface *{scroll-behavior:auto!important}}
 
 /* Room lobby: real host presence, with privacy choices kept next to the create action. */
 .room-entry-grid{align-items:start;grid-template-columns:1fr 1fr}

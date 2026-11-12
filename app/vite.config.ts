@@ -54,5 +54,9 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
-  server: { port: 5173, strictPort: true }
+  server: {
+    port: 5173,
+    strictPort: true,
+    watch: { usePolling: process.env.DOCKER_DEV === '1' }
+  }
 }));

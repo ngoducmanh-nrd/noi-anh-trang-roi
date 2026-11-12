@@ -1,0 +1,37 @@
+services:
+  app:
+    build:
+      context: .
+      target: app
+    ports:
+      - "127.0.0.1:5173:5173"
+    environment:
+      DOCKER_DEV: "1"
+    volumes:
+      - ./app:/workspace/app
+      - app_node_modules:/workspace/app/node_modules
+      - ./docker/app-config.js:/workspace/app/public/app-config.js:ro
+    depends_on:
+      - emulator
+
+  emulator:
+    build:
+      context: .
+      target: emulator
+    ports:
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9099:9099"
+    volumes:
+      - ./database.rules.json:/workspace/database.rules.json:ro
+
+  rules-test:
+    profiles: [test]
+    build:
+      context: .
+      target: emulator
+    command: ["npm", "test"]
+    volumes:
+      - ./database.rules.json:/workspace/database.rules.json:ro
+
+volumes:
+  app_node_modules:

@@ -4,6 +4,25 @@
 
 ## Chạy và kiểm tra
 
+### Docker (môi trường dev tách biệt)
+
+Cài Docker Desktop với Compose, sau đó chạy từ thư mục gốc:
+
+```powershell
+docker compose up --build
+```
+
+Mở http://127.0.0.1:5173. Compose chạy Vite với hot reload và Firebase Auth/Database Emulator trên localhost (cổng 9099/9000). `docker/app-config.js` dùng project demo và được gắn đè chỉ trong container; file cấu hình Firebase thật trong `app/public/` không đổi. Dữ liệu emulator chỉ nằm trong bộ nhớ và mất khi dừng container. Không dùng Compose này để triển khai production.
+
+```powershell
+docker compose exec app npm run check       # kiểm tra TypeScript
+docker compose exec app npm run test:games  # kiểm tra luật game
+docker compose run --rm rules-test          # kiểm tra Firebase Rules trong emulator riêng
+docker compose down                         # dừng môi trường dev
+```
+
+Sau khi đổi `app/package-lock.json`, chạy `docker compose exec app npm ci` để cập nhật volume dependency; lần mở tiếp theo có thể dùng `docker compose up --build`. Xem `app/README.md` để chạy trực tiếp không qua Docker.
+
 ```powershell
 cd app
 npm ci
